@@ -2,6 +2,7 @@ package com.tvseries.TvSeries;
 
 import java.util.List;
 
+import com.tvseries.TvSeries.dto.TvShow;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

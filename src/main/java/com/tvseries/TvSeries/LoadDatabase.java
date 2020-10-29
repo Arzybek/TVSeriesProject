@@ -1,5 +1,6 @@
 package com.tvseries.TvSeries;
 
+import com.tvseries.TvSeries.dto.TvShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
