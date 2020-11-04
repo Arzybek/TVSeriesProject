@@ -16,13 +16,13 @@ public class TvShow {
     private String name;
     private String category;
     private int year;
-    private Image image;
+    //private Image image;
     private String description;
     private int watcherCount;
 
-    public void setImage(Image image) {
-        this.image = image;
-    }
+    //public void setImage(Image image) {
+   //     this.image = image;
+    //}
 
     public void setDescription(String description) {
         this.description = description;
@@ -32,9 +32,9 @@ public class TvShow {
         this.watcherCount = watcherCount;
     }
 
-    public Image getImage() {
-        return image;
-    }
+    //public Image getImage() {
+    //    return image;
+    //}
 
     public String getDescription() {
         return description;
@@ -44,15 +44,15 @@ public class TvShow {
         return watcherCount;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
+   // public List<Comment> getComments() {
+    //    return comments;
+   // }
 
-    private List<Comment> comments = new ArrayList();
+    //private List<Comment> comments = new ArrayList();
 
     TvShow() {}
 
-    TvShow(String name, String category, int year) {
+    public TvShow(String name, String category, int year) {
 
         this.name = name;
         this.category = category;

@@ -10,19 +10,19 @@ public class Comment {
     @GeneratedValue
     Long id;
 
-    public Comment(String title, String data, byte mark, User author, TvShow show) {
+    public Comment(String title, String data, byte mark) {
         this.title = title;
         this.data = data;
         this.mark = mark;
-        this.author = author;
-        this.show = show;
+        //this.author = author;
+        //this.show = show;
     }
 
     private String title;
     private String data;
     private byte mark;
-    private User author;
-    private TvShow show;
+    //private User author;
+    //private TvShow show;
 
     public Long getId() {
         return id;
@@ -56,19 +56,19 @@ public class Comment {
         this.mark = (byte)(mark & 5);
     }
 
-    public User getAuthor() {
-        return author;
-    }
+    //public User getAuthor() {
+    //    return author;
+    //}
 
-    public void setAuthor(User author) {
-        this.author = author;
-    }
+    //public void setAuthor(User author) {
+    //    this.author = author;
+    //}
 
-    public TvShow getShow() {
-        return show;
-    }
+    //public TvShow getShow() {
+    //    return show;
+    //}
 
-    public void setShow(TvShow show) {
-        this.show = show;
-    }
+    //public void setShow(TvShow show) {
+    //    this.show = show;
+    //}
 }

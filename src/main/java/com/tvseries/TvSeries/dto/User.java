@@ -13,14 +13,14 @@ public class User {
     Long id;
 
     private String name;
-    private List<TvShow> watchingShows = new ArrayList<>();
-    private List<TvShow> likedShows = new ArrayList<>();
-    private List<TvShow> featureShows = new ArrayList<>();
-    private List<Comment> comments = new ArrayList<>();
+    //private List<TvShow> watchingShows = new ArrayList<>();
+    //private List<TvShow> likedShows = new ArrayList<>();
+    //private List<TvShow> featureShows = new ArrayList<>();
+    //private List<Comment> comments = new ArrayList<>();
 
-    public List<Comment> getComments() {
-        return comments;
-    }
+    //public List<Comment> getComments() {
+    //    return comments;
+    //}
 
     private String description;
     private int age;
@@ -44,7 +44,7 @@ public class User {
         this.name = name;
     }
 
-    public List<TvShow> getWatchingShows() {
+    /*public List<TvShow> getWatchingShows() {
         return watchingShows;
     }
 
@@ -58,15 +58,15 @@ public class User {
 
     public void setLikedShows(List<TvShow> likedShows) {
         this.likedShows = likedShows;
-    }
+    }*/
 
-    public List<TvShow> getFeatureShows() {
-        return featureShows;
-    }
+    //public List<TvShow> getFeatureShows() {
+    //    return featureShows;
+    //}
 
-    public void setFeatureShows(List<TvShow> featureShows) {
-        this.featureShows = featureShows;
-    }
+    //public void setFeatureShows(List<TvShow> featureShows) {
+    //    this.featureShows = featureShows;
+    //}
 
     public String getDescription() {
         return description;
