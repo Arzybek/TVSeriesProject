@@ -1,5 +1,8 @@
 package com.tvseries.TvSeries;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 
 import com.auth0.jwt.JWT;
@@ -9,15 +12,27 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.tvseries.TvSeries.dto.TvShow;
+import common.RSA;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 @RestController
+@ComponentScan("common")
 class TvShowController {
 
     private final TvShowRepository repository;
 
-    TvShowController(TvShowRepository repository) {
+    private RSA rsa;
+
+    TvShowController(TvShowRepository repository, RSA rsa) {
+
         this.repository = repository;
+        this.rsa = rsa;
     }
 
     // Aggregate root
@@ -69,15 +84,33 @@ class TvShowController {
         if (isVerified)
             return "hello";
         else
-            return "you are not logged in";
+            return "you are not logged in"; // возможно стоит сделать return auth()
+    }
+
+
+    @GetMapping("/register") // здесь мы даем юзеру наш публичный RSA ключ чтобы он зашифровал свои логин - пароль и направляем в register
+    String register()
+    {
+        return rsa.getPublicKey().toString();
     }
 
 
     @PostMapping("/register")
-    String register(@CookieValue("register") String cookie)
+    String register(@CookieValue("register") String RSAlogpass)
     {
-        System.out.println(cookie);
-        var regInfo = cookie.split(":");
+        String decrypted;
+        try {
+            //System.out.println(RSAlogpass);
+            decrypted = rsa.decrypt(RSAlogpass, rsa.getPrivateKey());
+            System.out.println(decrypted);
+        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            e.printStackTrace();
+            return "";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+        var regInfo = decrypted.split(":");
         // здесь нужно добавлять пользователя в базу юзеров
         try {
             Algorithm algorithm = Algorithm.HMAC256(regInfo[1]); // возвращаем токен для последующей аутентификации
