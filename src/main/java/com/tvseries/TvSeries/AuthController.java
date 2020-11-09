@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.tvseries.TvSeries.dto.User;
 import common.RSA;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -16,8 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.xml.bind.DatatypeConverter;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @RestController
@@ -25,12 +30,14 @@ import java.security.NoSuchAlgorithmException;
 public class AuthController {
 
     private RSA rsa;
-    private final TvShowRepository repository;
+    private final TvShowRepository seriesRepository;
+    private final UserRepository userRepository;
 
-    AuthController(TvShowRepository repository, RSA rsa) {
+    AuthController(TvShowRepository seriesRepository, UserRepository userRepository, RSA rsa) {
 
         this.rsa = rsa;
-        this.repository = repository;
+        this.seriesRepository = seriesRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -68,13 +75,34 @@ public class AuthController {
             return "";
         }
         var regInfo = decrypted.split(":");
-        // здесь нужно добавлять пользователя в базу юзеров
+        var login = regInfo[0];
+        var password = regInfo[1];
+
+        MessageDigest md = null;
         try {
-            Algorithm algorithm = Algorithm.HMAC256(regInfo[1]); // возвращаем токен для последующей аутентификации
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        try {
+            var newUser = new User();
+            newUser.setName(regInfo[0]);
+            newUser.setPasswordHash(passHash);
+            var saved = userRepository.save(newUser);
+            long id = saved.getId();
+
+            Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
             String token = JWT.create()
                     .withIssuer("Issuer")
                     .withClaim("user", regInfo[0])
+                    .withClaim("id", id)
                     .sign(algorithm);
+
+
             return token;
         } catch (JWTCreationException exception){
             return "";
@@ -85,11 +113,24 @@ public class AuthController {
     private boolean verifyUser(String token)
     {
         // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
-        String pass = "TABURETH"; // и вставить пароль сюда
+
+        Pattern pattern = Pattern.compile("\"id\":(.+),");
+        Matcher matcher = pattern.matcher(token);
+        String strId = "";
+        while (matcher.find()) {
+            System.out.println(token.substring(matcher.start(), matcher.end()));
+            strId = matcher.group(1);
+        }
+
+        long id = Long.parseLong(strId);
+        var user = userRepository.getOne(id);
+        var passHash = user.getPasswordHash();
         try {
-            Algorithm algorithm = Algorithm.HMAC256(pass);
+            Algorithm algorithm = Algorithm.HMAC256(passHash);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Issuer")
+                    .withClaim("user", user.getLogin())
+                    .withClaim("id", user.getId())
                     .build();
             DecodedJWT jwt = verifier.verify(token);
         } catch (JWTVerificationException exception){
