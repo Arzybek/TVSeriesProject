@@ -1,8 +1,13 @@
 package com.tvseries.TvSeries.dto;
 
+import org.hibernate.annotations.Fetch;
+import org.springframework.data.repository.cdi.Eager;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 

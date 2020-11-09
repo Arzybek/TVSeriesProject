@@ -8,7 +8,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.tvseries.TvSeries.dto.User;
 import common.RSA;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.repository.cdi.Eager;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +24,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,13 +34,11 @@ import java.util.regex.Pattern;
 public class AuthController {
 
     private RSA rsa;
-    private final TvShowRepository seriesRepository;
     private final UserRepository userRepository;
 
-    AuthController(TvShowRepository seriesRepository, UserRepository userRepository, RSA rsa) {
+    AuthController(UserRepository userRepository, RSA rsa) {
 
         this.rsa = rsa;
-        this.seriesRepository = seriesRepository;
         this.userRepository = userRepository;
     }
 
@@ -110,33 +112,69 @@ public class AuthController {
     }
 
 
-    private boolean verifyUser(String token)
+    public boolean verifyUser(String token)
     {
         // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
 
-        Pattern pattern = Pattern.compile("\"id\":(.+),");
-        Matcher matcher = pattern.matcher(token);
-        String strId = "";
-        while (matcher.find()) {
-            System.out.println(token.substring(matcher.start(), matcher.end()));
-            strId = matcher.group(1);
+        long id = getIdFromJWT(token);
+        if (id==-1 || !userRepository.existsById(id))
+            return false;
+        String passHash;
+        String login;
+        long idDB = 0;
+        try
+        {
+            passHash = userRepository.getOne(id).getPasswordHash();
+            login = userRepository.getOne(id).getLogin();
+            idDB = userRepository.getOne(id).getId();
         }
-
-        long id = Long.parseLong(strId);
-        var user = userRepository.getOne(id);
-        var passHash = user.getPasswordHash();
+        catch (Exception e)
+        {
+            return false;
+        }
         try {
             Algorithm algorithm = Algorithm.HMAC256(passHash);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Issuer")
-                    .withClaim("user", user.getLogin())
-                    .withClaim("id", user.getId())
+                    .withClaim("user", login)
+                    .withClaim("id", idDB)
                     .build();
             DecodedJWT jwt = verifier.verify(token);
         } catch (JWTVerificationException exception){
             return false;
         }
         return true;
+    }
+
+    public long getIdFromJWT(String token)
+    {
+        System.out.println(token);
+        String[] secondPart = token.split("\\.");
+        if (secondPart.length<3)
+            return -1;
+        byte[] decoded = Base64.getUrlDecoder().decode(secondPart[1]);
+        String token_parsed = new String(decoded);
+        Pattern pattern = Pattern.compile("\"id\":(.+),");
+        Matcher matcher = pattern.matcher(token_parsed);
+        var aaa = matcher.find();
+        String strId = "";
+        try{
+            strId = matcher.group(1);
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
+
+        long id;
+        try {
+            id = Long.parseLong(strId);
+            return id;
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
     }
 
 
