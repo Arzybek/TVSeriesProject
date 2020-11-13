@@ -24,7 +24,9 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,9 +93,9 @@ public class AuthController {
         byte[] digest = md.digest();
         String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         try {
-            var newUser = new User();
-            newUser.setName(regInfo[0]);
-            newUser.setPasswordHash(passHash);
+            var newUser = new User(regInfo[0], regInfo[0], passHash);
+            //newUser.setName(regInfo[0]);
+            //newUser.setPasswordHash(passHash);
             var saved = userRepository.save(newUser);
             long id = saved.getId();
 
@@ -112,6 +114,16 @@ public class AuthController {
     }
 
 
+    @GetMapping("/profile")
+    User getProfile(@CookieValue String token)
+    {
+        long id = getIdFromJWT(token);
+        return userRepository.getOne(id);
+
+    }
+
+
+
     public boolean verifyUser(String token)
     {
         // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
@@ -124,9 +136,15 @@ public class AuthController {
         long idDB = 0;
         try
         {
-            passHash = userRepository.getOne(id).getPasswordHash();
-            login = userRepository.getOne(id).getLogin();
-            idDB = userRepository.getOne(id).getId();
+            var idList = new ArrayList<Long>();
+            idList.add(id);
+            var users = userRepository.findAllById(idList);
+            passHash = users.get(0).getPasswordHash();
+            login = users.get(0).getLogin();
+            idDB = users.get(0).getId();
+            //passHash = userRepository.getOne(id).getPasswordHash();
+            //login = userRepository.getOne(id).getLogin();
+            //idDB = userRepository.getOne(id).getId();
         }
         catch (Exception e)
         {

@@ -29,8 +29,7 @@ public class AuthTests {
     }
 
     @Test
-    public void TestVerifyUserNoUser()
-    {
+    public void TestVerifyUserNoUser() {
         var controller = new AuthController(userRepository, rsa);
         assert !controller.verifyUser("aaa");
         assert !controller.verifyUser("");
@@ -43,7 +42,9 @@ public class AuthTests {
         String regInfo = "test:1234";
         var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
         var token = controller.register(rsaLogPass);
-        System.out.println(token);
+        //System.out.println(token);
+        long id = controller.getIdFromJWT(token);
+        System.out.println(id);
         assert controller.verifyUser(token);
     }
 
@@ -55,19 +56,26 @@ public class AuthTests {
         var token = controller.register(rsaLogPass);
         //token = token.replace("\n", "");
         long id = controller.getIdFromJWT(token);
-        assert id==3;
+        assert id == 3;
     }
+
 
     @Test
-    public void TestGetIdFromJWTFake()
-    {
+    public void TestLoginUser() throws Exception {
         var controller = new AuthController(userRepository, rsa);
-        var text = "{\"id\":1,aaaa}";
-        var baseEncoded = Base64.encodeBase64(text.getBytes());
-        var fakeStr = new String(baseEncoded);
-        var id = controller.getIdFromJWT(fakeStr);
-        System.out.println(id);
-        assert id==1;
+        String regInfo = "test:1234";
+        var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
+        var token = controller.register(rsaLogPass);
+        var answer = controller.auth(token);
+        assert answer == "hello";
     }
 
+
+    @Test
+    public void TestLoginInvalidUser() throws Exception {
+        var controller = new AuthController(userRepository, rsa);
+        var token = "TABURETH";
+        var answer = controller.auth(token);
+        assert answer == "you are not logged in";
+    }
 }
