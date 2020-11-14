@@ -3,7 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+/apache-tomcat-9.0.39-windows-x64
 ### STS ###
 .apt_generated
 .classpath
