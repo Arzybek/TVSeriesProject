@@ -1,5 +1,6 @@
 package com.tvseries.TvSeries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.tvseries.TvSeries.dto.TvShow;
@@ -23,10 +24,18 @@ class TvShowController {
 
     // Aggregate root
 
-    //@GetMapping("/tvshows")
-    //List<TvShow> all() {
-    //    return tvShowrepository.findAll();
-    //}
+    @GetMapping("/tvshows")
+    List<TvShow> all(@RequestParam(value = "perPage", required = false) Integer perPage,
+                     @RequestParam(value = "page", required = false) Integer page) {
+        List<TvShow> allShows = tvShowrepository.findAll();
+        if(perPage!=null){
+            if(page==null)
+                page = 1;
+            ArrayList<List<TvShow>> pages = (ArrayList<List<TvShow>>) ListUtils.partition(allShows, perPage);
+            return pages.get(page-1);
+        }
+        else return tvShowrepository.findAll();
+    }
 
     @PostMapping("/tvshows")
     TvShow newTvShow(@RequestBody TvShow newEmployee) {
@@ -60,12 +69,6 @@ class TvShowController {
     @DeleteMapping("/tvshows/{id}")
     void deleteTvShow(@PathVariable Long id) {
         tvShowrepository.deleteById(id);
-    }
-
-    @GetMapping("/tvshows")
-    List<TvShow> getRange(@RequestParam int range, @RequestParam int page)
-    {
-        return tvShowrepository.findAll().subList(range*page, range*(page+1));
     }
 
 }

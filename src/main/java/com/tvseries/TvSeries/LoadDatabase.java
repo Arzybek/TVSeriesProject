@@ -18,6 +18,8 @@ class LoadDatabase {
         return args -> {
             log.info("Preloading " + repository.save(new TvShow("Everybody hates Chris", "comedy", 2005)));
             log.info("Preloading " + repository.save(new TvShow("Friends", "comedy", 1994)));
+            log.info("Preloading " + repository.save(new TvShow("The Middle", "sitcom,", 2009)));
+            log.info("Preloading " + repository.save(new TvShow("New Girl", "sitcom", 2011)));
         };
     }
 }
