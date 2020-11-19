@@ -62,6 +62,45 @@ public class AuthController {
         return rsa.getPublicKey().toString();
     }
 
+    @PostMapping("/register/insecure")
+    String insecureRegister(@CookieValue("register") String RSAlogpass)
+    {
+        System.out.println("insecure-register: "+RSAlogpass);
+        var regInfo = RSAlogpass.split(":");
+        var login = regInfo[0];
+        var password = regInfo[1];
+
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        try {
+            var newUser = new User(regInfo[0], regInfo[0], passHash);
+            //newUser.setName(regInfo[0]);
+            //newUser.setPasswordHash(passHash);
+            var saved = userRepository.save(newUser);
+            long id = saved.getId();
+
+            Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
+            String token = JWT.create()
+                    .withIssuer("Issuer")
+                    .withClaim("user", regInfo[0])
+                    .withClaim("id", id)
+                    .sign(algorithm);
+
+
+            return token;
+        } catch (JWTCreationException exception){
+            return "";
+        }
+    }
+
 
     @PostMapping("/register")
     String register(@CookieValue("register") String RSAlogpass)
@@ -115,10 +154,14 @@ public class AuthController {
 
 
     @GetMapping("/profile")
-    User getProfile(@CookieValue String token)
+    User getProfile(@CookieValue("auth") String token)
     {
+        System.out.println(token);
         long id = getIdFromJWT(token);
-        return userRepository.getOne(id);
+        System.out.println(id);
+        if (id==-1)
+            return null;
+        return userRepository.findById(id).get();
 
     }
 
