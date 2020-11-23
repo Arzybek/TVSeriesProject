@@ -1,4 +1,4 @@
-package com.tvseries.TvSeries;
+package com.tvseries.TvSeries.controllers;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -6,12 +6,10 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.tvseries.TvSeries.dto.User;
-import common.RSA;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
+import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.model.User;
+import com.tvseries.TvSeries.common.RSA;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.repository.cdi.Eager;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,19 +24,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 @RestController
-@ComponentScan("common")
+@ComponentScan("com.tvseries.TvSeries.common")
 public class AuthController {
 
     private RSA rsa;
     private final UserRepository userRepository;
 
-    AuthController(UserRepository userRepository, RSA rsa) {
+    public AuthController(UserRepository userRepository, RSA rsa) {
 
         this.rsa = rsa;
         this.userRepository = userRepository;
@@ -46,7 +43,7 @@ public class AuthController {
 
 
     @GetMapping("/auth")
-    String auth(@CookieValue("auth") String auth)
+    public String auth(@CookieValue("auth") String auth)
     {
         boolean isVerified = verifyUser(auth);
         if (isVerified)
@@ -103,7 +100,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    String register(@CookieValue("register") String RSAlogpass)
+    public String register(@CookieValue("register") String RSAlogpass)
     {
         String decrypted;
         try {

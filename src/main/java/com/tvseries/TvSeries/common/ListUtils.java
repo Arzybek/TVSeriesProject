@@ -1,6 +1,4 @@
-package com.tvseries.TvSeries;
-
-import com.tvseries.TvSeries.dto.TvShow;
+package com.tvseries.TvSeries.common;
 
 import java.util.ArrayList;
 import java.util.Collection;

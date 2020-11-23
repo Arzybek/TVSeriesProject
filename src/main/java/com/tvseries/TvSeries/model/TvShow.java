@@ -1,8 +1,5 @@
-package com.tvseries.TvSeries.dto;
+package com.tvseries.TvSeries.model;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Entity;

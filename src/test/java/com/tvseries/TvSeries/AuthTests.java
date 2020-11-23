@@ -1,18 +1,12 @@
 package com.tvseries.TvSeries;
 
 
-import com.tvseries.TvSeries.dto.User;
-import common.RSA;
-import org.apache.commons.codec.binary.Base64;
+import com.tvseries.TvSeries.controllers.AuthController;
+import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.common.RSA;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 
 @SpringBootTest
 public class AuthTests {
