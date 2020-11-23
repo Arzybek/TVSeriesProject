@@ -1,5 +1,6 @@
 package com.tvseries.TvSeries.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,11 @@ import com.tvseries.TvSeries.db.TvShowRepository;
 import com.tvseries.TvSeries.db.UserRepository;
 import com.tvseries.TvSeries.model.TvShow;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StreamUtils;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @ComponentScan("com.tvseries.TvSeries.common")
@@ -52,6 +57,13 @@ class TvShowController {
     TvShow one(@PathVariable Long id) {
         return tvShowrepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(""+id));
+    }
+
+    @GetMapping(value = "/tvshows/image/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
+    void getImage(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        var imgFile = new ClassPathResource("image/"+id.toString()+".jpg");
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        StreamUtils.copy(imgFile.getInputStream(), response.getOutputStream());
     }
 
     @PutMapping("/tvshows/{id}")
