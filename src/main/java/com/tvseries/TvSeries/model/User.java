@@ -23,6 +23,7 @@ public class User {
     private String description;
     private int age;
     private String login;
+    private String photoLink;
 
     public User(){}
 
@@ -92,9 +93,14 @@ public class User {
 
     private String passwordHash;
 
+    public String getPhotoLink(){
+        return this.photoLink;
+    }
+
     public User(String name, String login, String passwordHash) {
         this.name = name;
         this.login = login;
         this.passwordHash = passwordHash;
+        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
     }
 }
