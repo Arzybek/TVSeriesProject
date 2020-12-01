@@ -58,7 +58,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/insecure")
-    String insecureRegister(@CookieValue("register") String RSAlogpass) {
+    public String insecureRegister(@CookieValue("register") String RSAlogpass) {
         System.out.println("insecure-register: " + RSAlogpass);
         var regInfo = RSAlogpass.split(":");
         var login = regInfo[0];
@@ -174,9 +174,6 @@ public class AuthController {
             passHash = users.get(0).getPasswordHash();
             login = users.get(0).getLogin();
             idDB = users.get(0).getId();
-            //passHash = userRepository.getOne(id).getPasswordHash();
-            //login = userRepository.getOne(id).getLogin();
-            //idDB = userRepository.getOne(id).getId();
         } catch (Exception e) {
             return false;
         }
