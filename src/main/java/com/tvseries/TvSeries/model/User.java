@@ -1,8 +1,10 @@
 package com.tvseries.TvSeries.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.hibernate.annotations.Cascade;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -11,7 +13,10 @@ public class User {
     Long id;
 
     private String name;
-    //private List<TvShow> watchingShows = new ArrayList<>();
+
+    @OneToMany(targetEntity=TvShow.class,  fetch= FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private List<TvShow> watchingShows = new ArrayList<>();
     //private List<TvShow> likedShows = new ArrayList<>();
     //private List<TvShow> featureShows = new ArrayList<>();
     //private List<Comment> comments = new ArrayList<>();
@@ -43,11 +48,21 @@ public class User {
         this.name = name;
     }
 
-    /*public List<TvShow> getWatchingShows() {
+    public List<TvShow> getWatchingShows() {
         return watchingShows;
     }
 
-    public void setWatchingShows(List<TvShow> watchingShows) {
+    public void addWatchingShow(TvShow show)
+    {
+        watchingShows.add(show);
+    }
+
+    public boolean deleteWatchingShow(TvShow show)
+    {
+        return watchingShows.remove(show);
+    }
+
+    /*public void setWatchingShows(List<TvShow> watchingShows) {
         this.watchingShows = watchingShows;
     }
 

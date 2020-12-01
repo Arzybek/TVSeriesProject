@@ -194,7 +194,7 @@ public class AuthController {
         return true;
     }
 
-    public long getIdFromJWT(String token) {
+    public static long getIdFromJWT(String token) {
         System.out.println(token);
         String[] secondPart = token.split("\\.");
         if (secondPart.length < 3)
