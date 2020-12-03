@@ -1,5 +1,6 @@
 package com.tvseries.TvSeries.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -7,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class TvShow {
+public class TvShow implements Serializable {
 
     private @Id @GeneratedValue Long id;
     private String name;
@@ -47,7 +48,7 @@ public class TvShow {
 
     //private List<Comment> comments = new ArrayList();
 
-    TvShow() {}
+    public TvShow() {}
 
     public TvShow(String name, String category, int year) {
 

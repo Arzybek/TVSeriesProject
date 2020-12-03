@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.TvShowRepository;
-import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.db.TvShowService;
 import com.tvseries.TvSeries.model.TvShow;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ClassPathResource;
@@ -19,14 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 @ComponentScan("com.tvseries.TvSeries.common")
 class TvShowController {
 
-    private final TvShowRepository tvShowrepository;
+    private final TvShowService tvShowService;
 
-    private final UserRepository userRepository;
-
-    TvShowController(TvShowRepository TvShowrepository, UserRepository userRepository) {
-
-        this.tvShowrepository = TvShowrepository;
-        this.userRepository = userRepository;
+    TvShowController(TvShowService tvShowService) {
+        this.tvShowService = tvShowService;
     }
 
     // Aggregate root
@@ -34,29 +30,26 @@ class TvShowController {
     @GetMapping("/tvshows")
     List<TvShow> all(@RequestParam(value = "q", required = false) Integer perPage,
                      @RequestParam(value = "page", required = false) Integer page) {
-        List<TvShow> allShows = tvShowrepository.findAll();
+        List<TvShow> allShows = tvShowService.findAll();
         if(perPage!=null){
             if(page==null)
                 page = 1;
-            ArrayList<List<TvShow>> pages = (ArrayList<List<TvShow>>) ListUtils.partition(allShows, perPage);
-            if(page>pages.size() || page<=0)
-                return null;
-            return pages.get(page-1);
+            ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAll(page-1, perPage);
+            return pages;
         }
-        else return tvShowrepository.findAll();
+        else return tvShowService.findAll();
     }
 
     @PostMapping("/tvshows")
     TvShow newTvShow(@RequestBody TvShow newEmployee) {
-        return tvShowrepository.save(newEmployee);
+        return tvShowService.create(newEmployee);
     }
 
     // Single item
 
     @GetMapping("/tvshows/{id}")
     TvShow one(@PathVariable Long id) {
-        return tvShowrepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(""+id));
+        return tvShowService.read(id);
     }
 
     @GetMapping(value = "/tvshows/image/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -67,24 +60,13 @@ class TvShowController {
     }
 
     @PutMapping("/tvshows/{id}")
-    TvShow replaceTvShow(@RequestBody TvShow tvShow, @PathVariable Long id) {
-
-        return tvShowrepository.findById(id)
-                .map(show -> {
-                    show.setName(tvShow.getName());
-                    show.setCategory(tvShow.getCategory());
-                    show.setYear(tvShow.getYear());
-                    return tvShowrepository.save(show);
-                })
-                .orElseGet(() -> {
-                    tvShow.setId(id);
-                    return tvShowrepository.save(tvShow);
-                });
+    TvShow replaceTvShow(@RequestBody TvShow tvShow) {
+        return tvShowService.update(tvShow);
     }
 
     @DeleteMapping("/tvshows/{id}")
     void deleteTvShow(@PathVariable Long id) {
-        tvShowrepository.deleteById(id);
+        tvShowService.delete(id);
     }
 
 }
