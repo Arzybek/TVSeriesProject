@@ -8,7 +8,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.TvShowRepository;
+import com.tvseries.TvSeries.db.TvShowService;
 import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.db.UserService;
 import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,14 +25,14 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    private final TvShowRepository tvShowrepository;
+    private final TvShowService tvShowService;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(TvShowRepository TvShowrepository, UserRepository userRepository) {
+    public UserController(UserService userService, TvShowService tvShowService) {
 
-        this.tvShowrepository = TvShowrepository;
-        this.userRepository = userRepository;
+        this.tvShowService = tvShowService;
+        this.userService = userService;
     }
 
     // Aggregate root
@@ -43,7 +45,7 @@ public class UserController {
         if (!verifyUser(token))
             return null;
         long userID = AuthController.getIdFromJWT(token);
-        List<TvShow> allShows = userRepository.findById(userID).get().getWatchingShows();
+        List<TvShow> allShows = userService.getUser(userID).getWatchingShows();
         if(perPage!=null){
             if(page==null)
                 page = 1;
@@ -52,7 +54,7 @@ public class UserController {
                 return null;
             return pages.get(page-1);
         }
-        else return userRepository.findById(userID).get().getWatchingShows();
+        else return userService.getUser(userID).getWatchingShows();
     }
 
     @PostMapping("/deleteWatching")
@@ -61,10 +63,10 @@ public class UserController {
         if (!verifyUser(token))
             return false;
         long userID = AuthController.getIdFromJWT(token);
-        User user = userRepository.findById(userID).get();
-        TvShow show = tvShowrepository.findById(showID).get();
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
         user.deleteWatchingShow(show);
-        userRepository.save(user);
+        userService.save(user);
         return true;
     }
 
@@ -74,10 +76,10 @@ public class UserController {
         if (!verifyUser(token))
             return false;
         long userID = AuthController.getIdFromJWT(token);
-        User user = userRepository.findById(userID).get();
-        TvShow show = tvShowrepository.findById(showID).get();
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
         user.addWatchingShow(show);
-        userRepository.save(user);
+        userService.save(user);
         return true;
     }
 
@@ -86,18 +88,22 @@ public class UserController {
         // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
 
         long id = AuthController.getIdFromJWT(token);
-        if (id == -1 || !userRepository.existsById(id))
+        if (id == -1 || !userService.existsById(id))
             return false;
         String passHash;
         String login;
         long idDB = 0;
         try {
-            var idList = new ArrayList<Long>();
-            idList.add(id);
-            var users = userRepository.findAllById(idList);
-            passHash = users.get(0).getPasswordHash();
-            login = users.get(0).getLogin();
-            idDB = users.get(0).getId();
+           // var idList = new ArrayList<Long>();
+            //idList.add(id);
+            //var users = userRepository.findAllById(idList);
+            var user = userService.getUser(id);
+            passHash = user.getPasswordHash();
+            login = user.getLogin();
+            idDB = user.getId();
+            //passHash = users.get(0).getPasswordHash();
+            //login = users.get(0).getLogin();
+            //idDB = users.get(0).getId();
         } catch (Exception e) {
             return false;
         }

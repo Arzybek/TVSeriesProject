@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.db.UserService;
 import com.tvseries.TvSeries.model.User;
 import com.tvseries.TvSeries.common.RSA;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,11 @@ import java.util.regex.Pattern;
 public class AuthController {
 
     private RSA rsa;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepository, RSA rsa) {
+    public AuthController(UserService userService, RSA rsa) {
         this.rsa = rsa;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
 
@@ -78,7 +79,7 @@ public class AuthController {
             var newUser = new User(regInfo[0], regInfo[0], passHash);
             //newUser.setName(regInfo[0]);
             //newUser.setPasswordHash(passHash);
-            var saved = userRepository.save(newUser);
+            var saved = userService.save(newUser);
             long id = saved.getId();
 
             Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
@@ -128,7 +129,7 @@ public class AuthController {
             var newUser = new User(regInfo[0], regInfo[0], passHash);
             //newUser.setName(regInfo[0]);
             //newUser.setPasswordHash(passHash);
-            var saved = userRepository.save(newUser);
+            var saved = userService.save(newUser);
             long id = saved.getId();
 
             Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
@@ -153,7 +154,7 @@ public class AuthController {
         System.out.println(id);
         if (id == -1)
             return null;
-        return userRepository.findById(id).get();
+        return userService.getUser(id);
 
     }
 
@@ -162,18 +163,22 @@ public class AuthController {
         // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
 
         long id = getIdFromJWT(token);
-        if (id == -1 || !userRepository.existsById(id))
+        if (id == -1 || !userService.existsById(id))
             return false;
         String passHash;
         String login;
         long idDB = 0;
         try {
-            var idList = new ArrayList<Long>();
-            idList.add(id);
-            var users = userRepository.findAllById(idList);
-            passHash = users.get(0).getPasswordHash();
-            login = users.get(0).getLogin();
-            idDB = users.get(0).getId();
+            // var idList = new ArrayList<Long>();
+            //idList.add(id);
+            //var users = userRepository.findAllById(idList);
+            var user = userService.getUser(id);
+            passHash = user.getPasswordHash();
+            login = user.getLogin();
+            idDB = user.getId();
+            //passHash = users.get(0).getPasswordHash();
+            //login = users.get(0).getLogin();
+            //idDB = users.get(0).getId();
         } catch (Exception e) {
             return false;
         }
@@ -192,7 +197,7 @@ public class AuthController {
     }
 
     public static long getIdFromJWT(String token) {
-        System.out.println(token);
+        //System.out.println("token from getIdFromJWT "+token);
         String[] secondPart = token.split("\\.");
         if (secondPart.length < 3)
             return -1;

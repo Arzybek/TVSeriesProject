@@ -4,6 +4,7 @@ package com.tvseries.TvSeries;
 import com.tvseries.TvSeries.controllers.AuthController;
 import com.tvseries.TvSeries.db.UserRepository;
 import com.tvseries.TvSeries.common.RSA;
+import com.tvseries.TvSeries.db.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class AuthTests {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private RSA rsa;
@@ -24,7 +25,7 @@ public class AuthTests {
 
     @Test
     public void TestVerifyUserNoUser() {
-        var controller = new AuthController(userRepository, rsa);
+        var controller = new AuthController(userService, rsa);
         assert !controller.verifyUser("aaa");
         assert !controller.verifyUser("");
     }
@@ -32,7 +33,7 @@ public class AuthTests {
 
     @Test
     public void TestVerifyUserExistingUser() throws Exception {
-        var controller = new AuthController(userRepository, rsa);
+        var controller = new AuthController(userService, rsa);
         String regInfo = "test:1234";
         var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
         var token = controller.register(rsaLogPass);
@@ -44,7 +45,7 @@ public class AuthTests {
 
     @Test
     public void TestGetIdFromJWT() throws Exception {
-        var controller = new AuthController(userRepository, rsa);
+        var controller = new AuthController(userService, rsa);
         String regInfo = "test:1234";
         var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
         var token = controller.register(rsaLogPass);
@@ -56,7 +57,7 @@ public class AuthTests {
 
     @Test
     public void TestLoginUser() throws Exception {
-        var controller = new AuthController(userRepository, rsa);
+        var controller = new AuthController(userService, rsa);
         String regInfo = "test:1234";
         var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
         var token = controller.register(rsaLogPass);
@@ -67,7 +68,7 @@ public class AuthTests {
 
     @Test
     public void TestLoginInvalidUser() throws Exception {
-        var controller = new AuthController(userRepository, rsa);
+        var controller = new AuthController(userService, rsa);
         var token = "TABURETH";
         var answer = controller.auth(token);
         assert answer == "you are not logged in";
