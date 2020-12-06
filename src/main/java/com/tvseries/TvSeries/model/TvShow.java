@@ -1,11 +1,13 @@
 package com.tvseries.TvSeries.model;
 
+import org.hibernate.annotations.Cascade;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class TvShow implements Serializable {
@@ -17,6 +19,12 @@ public class TvShow implements Serializable {
     //private Image image;
     private String description;
     private int watcherCount;
+
+
+
+    @OneToMany(targetEntity=Episode.class,  fetch= FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private List<Episode> episodes = new ArrayList<>();
 
     //public void setImage(Image image) {
    //     this.image = image;
@@ -48,7 +56,8 @@ public class TvShow implements Serializable {
 
     //private List<Comment> comments = new ArrayList();
 
-    public TvShow() {}
+    public TvShow() {
+    }
 
     public TvShow(String name, String category, int year) {
 
@@ -87,6 +96,22 @@ public class TvShow implements Serializable {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public void addEpisode(Episode ep)
+    {
+        episodes.add(ep);
+    }
+
+    public void deleteEpisode(Episode ep)
+    {
+        episodes.remove(ep);
+    }
+
+
+    public List<Episode> getEpisodes()
+    {
+        return episodes;
     }
 
     @Override

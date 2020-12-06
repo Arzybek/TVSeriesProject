@@ -17,6 +17,9 @@ public class TvShowService {
     @Autowired
     private TvShowRepository repository;
 
+    @Autowired
+    private EpisodeRepository epRepository;
+
     public TvShow create(TvShow tvShow) {
         return repository.save(tvShow);
     }
