@@ -17,6 +17,7 @@ public class Episode {
     private long showID;
     private String description;
     private int watcherCount;
+    private boolean isWatched;
 
 
     public void setDescription(String description) {
@@ -29,6 +30,16 @@ public class Episode {
 
     public void setEpisodeName(String episodeName) {
         this.episodeName = episodeName;
+    }
+
+    public void watchEpisode()
+    {
+        isWatched = true;
+    }
+
+    public void unwatchEpisode()
+    {
+        isWatched = false;
     }
 
     public String getDescription() {
@@ -44,6 +55,7 @@ public class Episode {
         return this.index;
     }
 
+
     //private List<Comment> comments = new ArrayList();
 
     public Episode ()
@@ -56,6 +68,7 @@ public class Episode {
         this.show = show;
         this.showID = showID;
         this.index = index;
+        this.isWatched = false;
     }
 
     public Long getId() {

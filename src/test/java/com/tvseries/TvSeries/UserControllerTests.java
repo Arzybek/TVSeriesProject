@@ -3,10 +3,7 @@ package com.tvseries.TvSeries;
 import com.tvseries.TvSeries.common.RSA;
 import com.tvseries.TvSeries.controllers.AuthController;
 import com.tvseries.TvSeries.controllers.UserController;
-import com.tvseries.TvSeries.db.TvShowService;
-import com.tvseries.TvSeries.db.UserService;
-import com.tvseries.TvSeries.db.TvShowRepository;
-import com.tvseries.TvSeries.db.UserRepository;
+import com.tvseries.TvSeries.db.*;
 import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.junit.jupiter.api.Test;
@@ -23,6 +20,9 @@ public class UserControllerTests {
 
     @Autowired
     private TvShowService tvShowService;
+
+    @Autowired
+    private EpisodeRepository episodeRepository;
 
     @Autowired
     private RSA rsa;
@@ -50,7 +50,7 @@ public class UserControllerTests {
         var logpass = "aaa:111";
         var authController = new AuthController(userService, rsa);
         var token = authController.insecureRegister(logpass);
-        var userController = new UserController(userService, tvShowService);
+        var userController = new UserController(userService, tvShowService, episodeRepository);
         var randomShow = tvShowService.findAll().get(0);
         userController.addWatching(randomShow.getId(), token);
         assert userController.watching(10, 1, token).get(0).equals(randomShow);
@@ -63,7 +63,7 @@ public class UserControllerTests {
         var logpass = "aaa:111";
         var authController = new AuthController(userService, rsa);
         var token = authController.insecureRegister(logpass);
-        var userController = new UserController(userService, tvShowService);
+        var userController = new UserController(userService, tvShowService, episodeRepository);
         var randomShow1 = tvShowService.findAll().get(0);
         var randomShow2 = tvShowService.findAll().get(1);
         userController.addWatching(randomShow1.getId(), token);
@@ -82,7 +82,7 @@ public class UserControllerTests {
         var logpass = "aaa:111";
         var authController = new AuthController(userService, rsa);
         var token = authController.insecureRegister(logpass);
-        var userController = new UserController(userService, tvShowService);
+        var userController = new UserController(userService, tvShowService, episodeRepository);
         var randomShow = tvShowService.findAll().get(0);
         userController.addWatching(randomShow.getId(), token);
         assert userController.watching(10, 1, token).get(0).equals(randomShow);
@@ -95,7 +95,7 @@ public class UserControllerTests {
         var logpass = "aaa:111";
         var authController = new AuthController(userService, rsa);
         var token = authController.insecureRegister(logpass);
-        var userController = new UserController(userService, tvShowService);
+        var userController = new UserController(userService, tvShowService, episodeRepository);
         var randomShow = tvShowService.findAll().get(0);
         userController.addWatching(randomShow.getId(), token);
         assert userController.watching(10, 1, token).get(0).equals(randomShow);

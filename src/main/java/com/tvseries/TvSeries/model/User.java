@@ -62,6 +62,28 @@ public class User {
         return watchingShows.remove(show);
     }
 
+    public void watchEpisode(TvShow show, Episode episode)
+    {
+        int ind = watchingShows.indexOf(show);
+        if (ind==-1)
+            return;
+        int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
+        if (indEp==-1)
+            return;
+        watchingShows.get(ind).getEpisodes().get(indEp).watchEpisode();
+    }
+
+    public void unwatchEpisode(TvShow show, Episode episode)
+    {
+        int ind = watchingShows.indexOf(show);
+        if (ind==-1)
+            return;
+        int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
+        if (indEp==-1)
+            return;
+        watchingShows.get(ind).getEpisodes().get(indEp).unwatchEpisode();
+    }
+
     /*public void setWatchingShows(List<TvShow> watchingShows) {
         this.watchingShows = watchingShows;
     }

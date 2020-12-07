@@ -23,6 +23,8 @@ class LoadDatabase {
             {
                 var ep = new Episode(tvShow1.getName(),tvShow1.getId(), i);
                 ep.setEpisodeName("a"+i);
+                if (i%2==0)
+                    ep.watchEpisode();
                 tvShow1.addEpisode(epRepository.save(ep));
             }
             for(int i=1;i<=18;i++)

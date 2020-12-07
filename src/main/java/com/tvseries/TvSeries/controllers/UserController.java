@@ -7,10 +7,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.tvseries.TvSeries.common.ListUtils;
-import com.tvseries.TvSeries.db.TvShowRepository;
-import com.tvseries.TvSeries.db.TvShowService;
-import com.tvseries.TvSeries.db.UserRepository;
-import com.tvseries.TvSeries.db.UserService;
+import com.tvseries.TvSeries.db.*;
+import com.tvseries.TvSeries.model.Episode;
 import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,10 +27,13 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService, TvShowService tvShowService) {
+    private final EpisodeRepository episodeRepository;
+
+    public UserController(UserService userService, TvShowService tvShowService, EpisodeRepository episodeRepository) {
 
         this.tvShowService = tvShowService;
         this.userService = userService;
+        this.episodeRepository = episodeRepository;
     }
 
     // Aggregate root
@@ -82,6 +83,38 @@ public class UserController {
         userService.save(user);
         return true;
     }
+
+
+    @PostMapping("/watchEpisode")
+    public Boolean watchEpisode(@RequestParam(required = true) long showID, @RequestParam(required = true) long epID,  @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return false;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        Episode ep = episodeRepository.getOne(epID);
+        user.watchEpisode(show, ep);
+        userService.save(user);
+        return true;
+    }
+
+
+    @PostMapping("/unwatchEpisode")
+    public Boolean unwatchEpisode(@RequestParam(required = true) long showID, @RequestParam(required = true) long epID,  @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return false;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        Episode ep = episodeRepository.getOne(epID);
+        user.unwatchEpisode(show, ep);
+        userService.save(user);
+        return true;
+    }
+
+
 
 
     public boolean verifyUser(String token) {
