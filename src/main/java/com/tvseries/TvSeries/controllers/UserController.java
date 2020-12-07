@@ -80,7 +80,7 @@ public class UserController {
         User user = userService.getUser(userID);
         TvShow show = tvShowService.read(showID);
         user.addWatchingShow(show);
-        userService.save(user);
+        userService.update(user);
         return true;
     }
 
@@ -90,12 +90,21 @@ public class UserController {
     {
         if (!verifyUser(token))
             return false;
+        System.out.println("watch episode request"+showID+epID);
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         TvShow show = tvShowService.read(showID);
         Episode ep = episodeRepository.getOne(epID);
         user.watchEpisode(show, ep);
         userService.save(user);
+        //return true;
+
+        var aaa = userService.getUser(userID);
+        var show2 = aaa.getWatchingShows().get(0);
+        var eps = show2.getEpisodes();
+        for (int i=0;i<eps.size();i++)
+            System.out.println(eps.get(i).isEpisodeWatched());
+
         return true;
     }
 
@@ -112,6 +121,37 @@ public class UserController {
         user.unwatchEpisode(show, ep);
         userService.save(user);
         return true;
+    }
+
+
+    @GetMapping("/isWatching")
+    public Boolean isWatchingShow(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return false;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        return user.getWatchingShows().contains(show);
+    }
+
+
+    @GetMapping("/isWatched")
+    public Boolean isWatchedEpisode(@RequestParam(required = true) long showID,@RequestParam(required = true) long episodeID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return false;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        Episode episode = episodeRepository.getOne(episodeID);
+        if (!user.getWatchingShows().contains(show))
+            return false;
+        var showIndex = user.getWatchingShows().indexOf(show);
+        if (!user.getWatchingShows().get(showIndex).getEpisodes().contains(episode))
+            return false;
+        var epIndex = user.getWatchingShows().get(showIndex).getEpisodes().indexOf(episode);
+        return user.getWatchingShows().get(showIndex).getEpisodes().get(epIndex).isEpisodeWatched();
     }
 
 

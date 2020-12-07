@@ -76,11 +76,20 @@ public class AuthController {
         byte[] digest = md.digest();
         String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         try {
-            var newUser = new User(regInfo[0], regInfo[0], passHash);
+            var newUser = new User(login, login, passHash);
             //newUser.setName(regInfo[0]);
             //newUser.setPasswordHash(passHash);
-            var saved = userService.save(newUser);
-            long id = saved.getId();
+            long id;
+            var exists = userService.existsByLogPass(login, passHash);
+            if (exists) {
+                var user = userService.getByLogPass(login, passHash);
+                id = user.getId();
+            }
+            else
+            {
+                var saved = userService.save(newUser);
+                id = saved.getId();
+            }
 
             Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
             String token = JWT.create()

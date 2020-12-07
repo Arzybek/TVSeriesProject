@@ -65,22 +65,30 @@ public class User {
     public void watchEpisode(TvShow show, Episode episode)
     {
         int ind = watchingShows.indexOf(show);
-        if (ind==-1)
+        if (ind==-1) {
+            System.out.println("watchEpisodeError: this show not in watching");
             return;
+        }
         int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
-        if (indEp==-1)
+        if (indEp==-1) {
+            System.out.println("watchEpisodeError: this show not in episode list");
             return;
+        }
         watchingShows.get(ind).getEpisodes().get(indEp).watchEpisode();
     }
 
     public void unwatchEpisode(TvShow show, Episode episode)
     {
         int ind = watchingShows.indexOf(show);
-        if (ind==-1)
+        if (ind==-1) {
+            System.out.println("unwatchEpisodeError: this show not in watching");
             return;
+        }
         int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
-        if (indEp==-1)
+        if (indEp==-1) {
+            System.out.println("unwatchEpisodeError: this show not in episode list");
             return;
+        }
         watchingShows.get(ind).getEpisodes().get(indEp).unwatchEpisode();
     }
 

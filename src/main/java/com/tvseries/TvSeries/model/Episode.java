@@ -34,12 +34,17 @@ public class Episode {
 
     public void watchEpisode()
     {
-        isWatched = true;
+        this.isWatched = true;
+    }
+
+    public Boolean isEpisodeWatched()
+    {
+        return isWatched;
     }
 
     public void unwatchEpisode()
     {
-        isWatched = false;
+        this.isWatched = false;
     }
 
     public String getDescription() {
