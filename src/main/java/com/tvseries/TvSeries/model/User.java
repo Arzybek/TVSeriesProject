@@ -3,8 +3,11 @@ package com.tvseries.TvSeries.model;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -14,9 +17,8 @@ public class User {
 
     private String name;
 
-    @OneToMany(targetEntity=TvShow.class,  fetch= FetchType.EAGER)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private List<TvShow> watchingShows = new ArrayList<>();
+    @Column( length = 100000 )
+    private HashMap<Long, Boolean[]> watchingShows = new HashMap<>();
     //private List<TvShow> likedShows = new ArrayList<>();
     //private List<TvShow> featureShows = new ArrayList<>();
     //private List<Comment> comments = new ArrayList<>();
@@ -48,48 +50,57 @@ public class User {
         this.name = name;
     }
 
-    public List<TvShow> getWatchingShows() {
-        return watchingShows;
+    public Set<Long> getWatchingShowsIDs() {
+        return watchingShows.keySet();
     }
 
     public void addWatchingShow(TvShow show)
     {
-        watchingShows.add(show);
+        var episodesCounter = show.getEpisodes().size();
+        var epWatch = new Boolean[episodesCounter];
+        for (int i=0;i<episodesCounter;i++)
+            epWatch[i] = false;
+        watchingShows.put(show.getId(),epWatch);
     }
 
-    public boolean deleteWatchingShow(TvShow show)
+    public void deleteWatchingShow(Long showID)
     {
-        return watchingShows.remove(show);
+        watchingShows.remove(showID);
     }
 
-    public void watchEpisode(TvShow show, Episode episode)
+    public void watchEpisode(Long showID, Long episodeID)
     {
-        int ind = watchingShows.indexOf(show);
-        if (ind==-1) {
-            System.out.println("watchEpisodeError: this show not in watching");
+        if (!watchingShows.containsKey(showID))
             return;
-        }
-        int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
-        if (indEp==-1) {
-            System.out.println("watchEpisodeError: this show not in episode list");
+        if (watchingShows.get(showID).length<episodeID)
             return;
-        }
-        watchingShows.get(ind).getEpisodes().get(indEp).watchEpisode();
+        watchingShows.get(showID)[episodeID.intValue()] = true;
     }
 
-    public void unwatchEpisode(TvShow show, Episode episode)
+    public void unwatchEpisode(Long showID, Long episodeID)
     {
-        int ind = watchingShows.indexOf(show);
-        if (ind==-1) {
-            System.out.println("unwatchEpisodeError: this show not in watching");
+        if (!watchingShows.containsKey(showID))
             return;
-        }
-        int indEp = watchingShows.get(ind).getEpisodes().indexOf(episode);
-        if (indEp==-1) {
-            System.out.println("unwatchEpisodeError: this show not in episode list");
+        if (watchingShows.get(showID).length<episodeID)
             return;
-        }
-        watchingShows.get(ind).getEpisodes().get(indEp).unwatchEpisode();
+        watchingShows.get(showID)[episodeID.intValue()] = false;
+    }
+
+    public Boolean isWatchedEpisode(Long showID, Long episodeID)
+    {
+        if (!watchingShows.containsKey(showID))
+            return false;
+        if (watchingShows.get(showID).length<episodeID)
+            return false;
+        return watchingShows.get(showID)[episodeID.intValue()];
+    }
+
+
+    public Boolean[] getWatchedEpisodes(Long showID)
+    {
+        if (!watchingShows.containsKey(showID))
+            return null;
+        return watchingShows.get(showID);
     }
 
     /*public void setWatchingShows(List<TvShow> watchingShows) {

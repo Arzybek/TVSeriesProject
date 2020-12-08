@@ -17,8 +17,6 @@ public class Episode {
     private long showID;
     private String description;
     private int watcherCount;
-    private boolean isWatched;
-
 
     public void setDescription(String description) {
         this.description = description;
@@ -30,21 +28,6 @@ public class Episode {
 
     public void setEpisodeName(String episodeName) {
         this.episodeName = episodeName;
-    }
-
-    public void watchEpisode()
-    {
-        this.isWatched = true;
-    }
-
-    public Boolean isEpisodeWatched()
-    {
-        return isWatched;
-    }
-
-    public void unwatchEpisode()
-    {
-        this.isWatched = false;
     }
 
     public String getDescription() {
@@ -73,7 +56,6 @@ public class Episode {
         this.show = show;
         this.showID = showID;
         this.index = index;
-        this.isWatched = false;
     }
 
     public Long getId() {

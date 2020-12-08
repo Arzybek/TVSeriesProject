@@ -29,7 +29,7 @@ public class UserShowsInteractionTests {
 
         var user2 = userRepository.save(user);
 
-        assert userRepository.findById(user2.getId()).get().getWatchingShows().get(0).equals(show);
+        assert userRepository.findById(user2.getId()).get().getWatchingShowsIDs().toArray()[0].equals(show.getId());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class UserShowsInteractionTests {
 
         var user2 = userRepository.save(user);
 
-        assert userRepository.findById(user2.getId()).get().getWatchingShows().get(0).equals(show);
+        assert userRepository.findById(user2.getId()).get().getWatchingShowsIDs().toArray()[0].equals(show.getId());
 
         user = userRepository.findById(user2.getId()).get();
 
@@ -49,11 +49,11 @@ public class UserShowsInteractionTests {
 
         user2 = userRepository.save(user);
 
-        assert userRepository.findById(user2.getId()).get().getWatchingShows().size()==2;
+        assert userRepository.findById(user2.getId()).get().getWatchingShowsIDs().size()==2;
 
-        var showToCompare = userRepository.findById(user2.getId()).get().getWatchingShows().get(1);
+        var showToCompare = userRepository.findById(user2.getId()).get().getWatchingShowsIDs().toArray()[1];
 
-        assert showToCompare.equals(show);
+        assert showToCompare.equals(show.getId());
 
     }
 
@@ -69,15 +69,15 @@ public class UserShowsInteractionTests {
 
         var userFromDB = userRepository.findById(user2.getId()).get();
 
-        userFromDB.deleteWatchingShow(show2);
+        userFromDB.deleteWatchingShow(show2.getId());
 
         userRepository.save(userFromDB);
 
         userFromDB = userRepository.findById(userFromDB.getId()).get();
 
-        assert userFromDB.getWatchingShows().size()==1;
+        assert userFromDB.getWatchingShowsIDs().size()==1;
 
-        assert userFromDB.getWatchingShows().get(0).equals(show);
+        assert userFromDB.getWatchingShowsIDs().toArray()[0].equals(show.getId());
 
 
     }

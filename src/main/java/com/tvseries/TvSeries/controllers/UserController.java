@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.sound.midi.Track;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @ComponentScan("com.tvseries.TvSeries.common")
@@ -27,13 +28,13 @@ public class UserController {
 
     private final UserService userService;
 
-    private final EpisodeRepository episodeRepository;
+    private final EpisodeService episodeService;
 
-    public UserController(UserService userService, TvShowService tvShowService, EpisodeRepository episodeRepository) {
+    public UserController(UserService userService, TvShowService tvShowService, EpisodeService episodeService) {
 
         this.tvShowService = tvShowService;
         this.userService = userService;
-        this.episodeRepository = episodeRepository;
+        this.episodeService = episodeService;
     }
 
     // Aggregate root
@@ -46,7 +47,11 @@ public class UserController {
         if (!verifyUser(token))
             return null;
         long userID = AuthController.getIdFromJWT(token);
-        List<TvShow> allShows = userService.getUser(userID).getWatchingShows();
+        ArrayList<TvShow> allShows = new ArrayList<>();
+        Set<Long> allShowsID = userService.getUser(userID).getWatchingShowsIDs();
+        for (Long showID:allShowsID) {
+            allShows.add(tvShowService.read(showID));
+        }
         if(perPage!=null){
             if(page==null)
                 page = 1;
@@ -55,7 +60,7 @@ public class UserController {
                 return null;
             return pages.get(page-1);
         }
-        else return userService.getUser(userID).getWatchingShows();
+        else return allShows;
     }
 
     @PostMapping("/deleteWatching")
@@ -65,8 +70,7 @@ public class UserController {
             return false;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        user.deleteWatchingShow(show);
+        user.deleteWatchingShow(showID);
         userService.save(user);
         return true;
     }
@@ -94,17 +98,9 @@ public class UserController {
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         TvShow show = tvShowService.read(showID);
-        Episode ep = episodeRepository.getOne(epID);
-        user.watchEpisode(show, ep);
+        Episode ep = episodeService.getOne(epID);
+        user.watchEpisode(showID, epID);
         userService.save(user);
-        //return true;
-
-        var aaa = userService.getUser(userID);
-        var show2 = aaa.getWatchingShows().get(0);
-        var eps = show2.getEpisodes();
-        for (int i=0;i<eps.size();i++)
-            System.out.println(eps.get(i).isEpisodeWatched());
-
         return true;
     }
 
@@ -116,9 +112,7 @@ public class UserController {
             return false;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        Episode ep = episodeRepository.getOne(epID);
-        user.unwatchEpisode(show, ep);
+        user.unwatchEpisode(showID, epID);
         userService.save(user);
         return true;
     }
@@ -131,27 +125,28 @@ public class UserController {
             return false;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        return user.getWatchingShows().contains(show);
+        return user.getWatchingShowsIDs().contains(showID);
     }
 
 
-    @GetMapping("/isWatched")
+    @GetMapping("/isWatchedEpisode")
     public Boolean isWatchedEpisode(@RequestParam(required = true) long showID,@RequestParam(required = true) long episodeID, @CookieValue("auth") String token)
     {
         if (!verifyUser(token))
             return false;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        Episode episode = episodeRepository.getOne(episodeID);
-        if (!user.getWatchingShows().contains(show))
-            return false;
-        var showIndex = user.getWatchingShows().indexOf(show);
-        if (!user.getWatchingShows().get(showIndex).getEpisodes().contains(episode))
-            return false;
-        var epIndex = user.getWatchingShows().get(showIndex).getEpisodes().indexOf(episode);
-        return user.getWatchingShows().get(showIndex).getEpisodes().get(epIndex).isEpisodeWatched();
+        return user.isWatchedEpisode(showID, episodeID);
+    }
+
+    @GetMapping("/watchedEpisodes")
+    public Boolean[] getWatchedEpisodes(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return null;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        return user.getWatchedEpisodes(showID);
     }
 
 
@@ -167,16 +162,10 @@ public class UserController {
         String login;
         long idDB = 0;
         try {
-           // var idList = new ArrayList<Long>();
-            //idList.add(id);
-            //var users = userRepository.findAllById(idList);
             var user = userService.getUser(id);
             passHash = user.getPasswordHash();
             login = user.getLogin();
             idDB = user.getId();
-            //passHash = users.get(0).getPasswordHash();
-            //login = users.get(0).getLogin();
-            //idDB = users.get(0).getId();
         } catch (Exception e) {
             return false;
         }
