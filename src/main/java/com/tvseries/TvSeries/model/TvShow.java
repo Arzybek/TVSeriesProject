@@ -17,6 +17,7 @@ public class TvShow implements Serializable {
     private String category;
     private int year;
     //private Image image;
+    private String imgLink;
     private String description;
     private int watcherCount;
 
@@ -107,6 +108,13 @@ public class TvShow implements Serializable {
     {
         episodes.remove(ep);
     }
+
+    public void setImgLink(String imgLink)
+    {
+        this.imgLink = imgLink;
+    }
+
+    public String getImgLink() {return this.imgLink;}
 
 
     public List<Episode> getEpisodes()

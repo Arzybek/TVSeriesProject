@@ -31,6 +31,8 @@ class LoadDatabase {
                 ep.setEpisodeName("b"+i);
                 tvShow2.addEpisode(epRepository.save(ep));
             }
+            tvShow1.setImgLink("1");
+            tvShow2.setImgLink("2");
             log.info("Preloading " + repository.save(tvShow1));
             log.info("EpisodesCount "+repository.findById(tvShow1.getId()).get().getEpisodes().size());
             log.info("Preloading " + repository.save(tvShow2));

@@ -15,9 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sound.midi.Track;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @ComponentScan("com.tvseries.TvSeries.common")
@@ -94,6 +92,56 @@ public class UserController {
         }
         return true;
     }
+
+
+    @PostMapping("/addUserWatchingShow")
+    public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestParam String info)
+    {
+        System.out.println("addUserWatchingShow request ");
+        //System.out.println(data);
+        if (!verifyUser(token)) {
+            System.out.println("addUserWatchingShow request: not verified user");
+            return false;
+        }
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = new TvShow();
+        info = info.substring(1);
+        info = info.substring(0, info.length()-1);
+        info = info.replace("\"", "");
+        var splitted  = info.split(", ");//  очень говнокод, нужно поискать норм либу
+        for (String prop:splitted) {
+            if(prop.startsWith("showName:"))
+            {
+                show.setName(prop.split(": ")[1]);
+            }
+            if (prop.startsWith("episodesCount:"))
+            {
+                int counter = Integer.parseInt(prop.split(": ")[1]);
+                for (int i=0;i<counter;i++)
+                {
+                    Episode ep = new Episode();
+                    ep.setIndex(i);
+                    show.addEpisode(ep);
+                    episodeService.create(ep);//возможно не нужно
+                }
+            }
+        }
+        show.setImgLink("100500");
+        show.setCategory("Added by user");
+        //show.setName(data.get("showName"));
+        //int counter = Integer.parseInt(data.get("episodesCount"));
+        tvShowService.create(show); // нужно сделать отдельную таблицу
+        user.addWatchingShow(show);
+        userService.update(user);
+        System.out.println("added");
+        for (Long id:userService.getUser(userID).getWatchingShowsIDs()) {
+            System.out.println(id);
+        }
+        return true;
+    }
+
+
 
 
     @PostMapping("/watchEpisode")
