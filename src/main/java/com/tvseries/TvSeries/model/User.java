@@ -153,6 +153,14 @@ public class User {
         return this.photoLink;
     }
 
+
+    public User(String login, String passwordHash) {
+        this.name = "logged anon";
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
+    }
+
     public User(String name, String login, String passwordHash) {
         this.name = name;
         this.login = login;

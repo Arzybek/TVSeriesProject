@@ -78,13 +78,20 @@ public class UserController {
     @PostMapping("/addWatching")
     public Boolean addWatching(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
-        if (!verifyUser(token))
+        System.out.println("watching show request "+showID);
+        if (!verifyUser(token)) {
+            System.out.println("watching show request: not verified user");
             return false;
+        }
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         TvShow show = tvShowService.read(showID);
         user.addWatchingShow(show);
         userService.update(user);
+        System.out.println("added");
+        for (Long id:userService.getUser(userID).getWatchingShowsIDs()) {
+            System.out.println(id);
+        }
         return true;
     }
 
@@ -121,10 +128,14 @@ public class UserController {
     @GetMapping("/isWatching")
     public Boolean isWatchingShow(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
-        if (!verifyUser(token))
+        System.out.println("isWatchingShow request: "+showID);
+        if (!verifyUser(token)) {
+            System.out.println("isWatchingShow request: not verified user");
             return false;
+        }
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
+        System.out.println(user.getWatchingShowsIDs().contains(showID));
         return user.getWatchingShowsIDs().contains(showID);
     }
 

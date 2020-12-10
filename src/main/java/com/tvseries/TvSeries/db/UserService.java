@@ -56,21 +56,23 @@ public class UserService {
 
     public Boolean existsByLogPass(String login, String pass){
 
-        ExampleMatcher matcher = ExampleMatcher.matching()
+        ExampleMatcher matcher = ExampleMatcher.matchingAny()
                 .withIgnorePaths("id")
+                .withIgnorePaths("watchingShows")
                 .withMatcher("login", ignoreCase())
-                .withMatcher("passwordHash", ignoreCase());
+                .withMatcher("passwordHash", ignoreCase()); // нужно сделать без игноркейса
 
 
-        var test = new User(login, login, pass);
+        var test = new User(login, pass);
         Example<User> example = Example.of(test, matcher);
+        var aaa = repository.exists(example);
         return repository.exists(example);
     }
 
 
     public User getByLogPass(String login, String pass){
 
-        ExampleMatcher matcher = ExampleMatcher.matching()
+        ExampleMatcher matcher = ExampleMatcher.matchingAny()
                 .withIgnorePaths("id")
                 .withMatcher("login", ignoreCase())
                 .withMatcher("passwordHash", ignoreCase());
