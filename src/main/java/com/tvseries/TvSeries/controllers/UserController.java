@@ -106,6 +106,8 @@ public class UserController {
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         TvShow show = new TvShow();
+        show.setisUserShow(true);
+        show.setAuthorID(userID);
         info = info.substring(1);
         info = info.substring(0, info.length()-1);
         info = info.replace("\"", "");

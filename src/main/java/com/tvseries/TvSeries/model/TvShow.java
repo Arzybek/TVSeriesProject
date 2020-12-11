@@ -20,6 +20,8 @@ public class TvShow implements Serializable {
     private String imgLink;
     private String description;
     private int watcherCount;
+    private Boolean isUserShow = false;
+    private Long authorID;
 
 
 
@@ -65,6 +67,15 @@ public class TvShow implements Serializable {
         this.name = name;
         this.category = category;
         this.year = year;
+    }
+
+    public TvShow(String name, String category, int year, Long authorID) {
+
+        this.name = name;
+        this.category = category;
+        this.year = year;
+        this.isUserShow = true;
+        this.authorID = authorID;
     }
 
     public Long getId() {
@@ -115,6 +126,26 @@ public class TvShow implements Serializable {
     }
 
     public String getImgLink() {return this.imgLink;}
+
+    public boolean isUserShow()
+    {
+        return isUserShow;
+    }
+
+    public void setisUserShow(boolean isUserShow)
+    {
+        this.isUserShow = isUserShow;
+    }
+
+    public void setAuthorID(Long ID)
+    {
+        this.authorID = ID;
+    }
+
+    public Long getAuthorID()
+    {
+        return this.authorID;
+    }
 
 
     public List<Episode> getEpisodes()

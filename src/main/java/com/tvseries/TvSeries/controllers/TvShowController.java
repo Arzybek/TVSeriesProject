@@ -34,7 +34,7 @@ class TvShowController {
         if(perPage!=null){
             if(page==null)
                 page = 1;
-            ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAll(page-1, perPage);
+            ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAllExceptCustom(page-1, perPage);
             return pages;
         }
         else return tvShowService.findAll();
