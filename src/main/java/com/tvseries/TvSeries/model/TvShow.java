@@ -16,7 +16,6 @@ public class TvShow implements Serializable {
     private String name;
     private String category;
     private int year;
-    //private Image image;
     private String imgLink;
     private String description;
     private int watcherCount;
@@ -63,10 +62,24 @@ public class TvShow implements Serializable {
     }
 
     public TvShow(String name, String category, int year) {
-
         this.name = name;
         this.category = category;
         this.year = year;
+    }
+
+    public TvShow(String name, String category, int year, String imgLink) {
+        this.name = name;
+        this.category = category;
+        this.year = year;
+        this.imgLink = imgLink;
+    }
+
+    public TvShow(String name, String category, int year, String imgLink, String description) {
+        this.name = name;
+        this.category = category;
+        this.year = year;
+        this.imgLink = imgLink;
+        this.description = description;
     }
 
     public TvShow(String name, String category, int year, Long authorID) {

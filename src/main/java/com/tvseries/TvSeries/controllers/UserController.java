@@ -132,7 +132,7 @@ public class UserController {
                 }
             }
         }
-        show.setImgLink("100500");
+        show.setImgLink("100");
         show.setCategory("Added by user");
         //show.setName(data.get("showName"));
         //int counter = Integer.parseInt(data.get("episodesCount"));
