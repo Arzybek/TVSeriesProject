@@ -160,7 +160,7 @@ public class AuthController {
         long id = getIdFromJWT(token);
         System.out.println(id);
         if (id == -1)
-            return null;
+            return new User("", "anonymous", "anonymous");
         return userService.getUser(id);
 
     }
