@@ -99,7 +99,7 @@ public class User {
     public Boolean[] getWatchedEpisodes(Long showID)
     {
         if (!watchingShows.containsKey(showID))
-            return null;
+            return new Boolean[0];
         return watchingShows.get(showID);
     }
 

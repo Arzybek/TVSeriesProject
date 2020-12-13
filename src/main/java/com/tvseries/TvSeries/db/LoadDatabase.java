@@ -17,8 +17,8 @@ class LoadDatabase {
     CommandLineRunner initDatabase(TvShowRepository repository, EpisodeRepository epRepository) {
 
         return args -> {
-            var tvShow1 = repository.save(new TvShow("Everybody hates Chris", "comedy", 2005));
-            var tvShow2 = repository.save(new TvShow("Friends", "comedy", 1994));
+            var tvShow1 = repository.save(new TvShow("Everybody hates Chris", "comedy", 2005, "1"));
+            var tvShow2 = repository.save(new TvShow("Friends", "comedy", 1994, "2"));
             for(int i=1;i<=10;i++)
             {
                 var ep = new Episode(tvShow1.getName(),tvShow1.getId(), i);
@@ -34,8 +34,8 @@ class LoadDatabase {
             log.info("Preloading " + repository.save(tvShow1));
             log.info("EpisodesCount "+repository.findById(tvShow1.getId()).get().getEpisodes().size());
             log.info("Preloading " + repository.save(tvShow2));
-            log.info("Preloading " + repository.save(new TvShow("The Middle", "sitcom,", 2009)));
-            log.info("Preloading " + repository.save(new TvShow("New Girl", "sitcom", 2011)));
+            log.info("Preloading " + repository.save(new TvShow("The Middle", "sitcom,", 2009, "3")));
+            log.info("Preloading " + repository.save(new TvShow("New Girl", "sitcom", 2011, "4")));
         };
     }
 }

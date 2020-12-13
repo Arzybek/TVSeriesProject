@@ -12,10 +12,8 @@ import com.tvseries.TvSeries.model.User;
 import com.tvseries.TvSeries.common.RSA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -162,7 +160,7 @@ public class AuthController {
         long id = getIdFromJWT(token);
         System.out.println(id);
         if (id == -1)
-            return null;
+            return new User("", "anonymous", "anonymous");
         return userService.getUser(id);
 
     }
@@ -229,6 +227,13 @@ public class AuthController {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
+        //
     }
 
 

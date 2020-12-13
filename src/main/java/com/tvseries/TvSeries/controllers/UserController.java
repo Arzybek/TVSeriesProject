@@ -13,11 +13,12 @@ import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.sound.midi.Track;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 
 @RestController
 @ComponentScan("com.tvseries.TvSeries.common")
@@ -96,6 +97,58 @@ public class UserController {
     }
 
 
+    @PostMapping("/addUserWatchingShow")
+    public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestParam String info)
+    {
+        System.out.println("addUserWatchingShow request ");
+        //System.out.println(data);
+        if (!verifyUser(token)) {
+            System.out.println("addUserWatchingShow request: not verified user");
+            return false;
+        }
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = new TvShow();
+        show.setisUserShow(true);
+        show.setAuthorID(userID);
+        info = info.substring(1);
+        info = info.substring(0, info.length()-1);
+        info = info.replace("\"", "");
+        var splitted  = info.split(", ");//  очень говнокод, нужно поискать норм либу
+        for (String prop:splitted) {
+            if(prop.startsWith("showName:"))
+            {
+                show.setName(prop.split(": ")[1]);
+            }
+            if (prop.startsWith("episodesCount:"))
+            {
+                int counter = Integer.parseInt(prop.split(": ")[1]);
+                for (int i=0;i<counter;i++)
+                {
+                    Episode ep = new Episode();
+                    ep.setIndex(i);
+                    show.addEpisode(ep);
+                    episodeService.create(ep);//возможно не нужно
+                }
+            }
+        }
+        show.setImgLink("100");
+        show.setCategory("Added by user");
+        //show.setName(data.get("showName"));
+        //int counter = Integer.parseInt(data.get("episodesCount"));
+        tvShowService.create(show); // нужно сделать отдельную таблицу
+        user.addWatchingShow(show);
+        userService.update(user);
+        System.out.println("added");
+        for (Long id:userService.getUser(userID).getWatchingShowsIDs()) {
+            System.out.println(id);
+        }
+        return true;
+    }
+
+
+
+
     @PostMapping("/watchEpisode")
     public Boolean watchEpisode(@RequestParam(required = true) long showID, @RequestParam(required = true) long epID,  @CookieValue("auth") String token)
     {
@@ -153,19 +206,20 @@ public class UserController {
     @GetMapping("/watchedEpisodes")
     public Boolean[] getWatchedEpisodes(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
+        System.out.println("watched episodes request");
         if (!verifyUser(token))
-            return null;
+            return new Boolean[0];
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
+        System.out.println(user.getWatchedEpisodes(showID).toString());
         return user.getWatchedEpisodes(showID);
     }
 
 
 
 
-    public boolean verifyUser(String token) {
-        // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
-
+    public boolean verifyUser(String token)
+    {
         long id = AuthController.getIdFromJWT(token);
         if (id == -1 || !userService.existsById(id))
             return false;
@@ -192,6 +246,13 @@ public class UserController {
             return false;
         }
         return true;
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
+        //
     }
 
 

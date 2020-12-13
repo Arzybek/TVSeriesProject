@@ -78,6 +78,10 @@ public class Episode {
         this.show = show;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
 
     @Override
     public boolean equals(Object o) {
