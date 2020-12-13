@@ -13,6 +13,8 @@ import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.sound.midi.Track;
 import java.util.*;
@@ -203,19 +205,20 @@ public class UserController {
     @GetMapping("/watchedEpisodes")
     public Boolean[] getWatchedEpisodes(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
+        System.out.println("watched episodes request");
         if (!verifyUser(token))
             return null;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
+        System.out.println(user.getWatchedEpisodes(showID).toString());
         return user.getWatchedEpisodes(showID);
     }
 
 
 
 
-    public boolean verifyUser(String token) {
-        // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
-
+    public boolean verifyUser(String token)
+    {
         long id = AuthController.getIdFromJWT(token);
         if (id == -1 || !userService.existsById(id))
             return false;
@@ -242,6 +245,13 @@ public class UserController {
             return false;
         }
         return true;
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
+        //
     }
 
 

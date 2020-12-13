@@ -13,6 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -67,6 +69,13 @@ class TvShowController {
     @DeleteMapping("/tvshows/{id}")
     void deleteTvShow(@PathVariable Long id) {
         tvShowService.delete(id);
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
+        //
     }
 
 }
