@@ -17,6 +17,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.sound.midi.Track;
+import java.lang.reflect.Array;
 import java.util.*;
 
 @RestController
@@ -207,7 +208,7 @@ public class UserController {
     {
         System.out.println("watched episodes request");
         if (!verifyUser(token))
-            return null;
+            return new Boolean[0];
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         System.out.println(user.getWatchedEpisodes(showID).toString());
