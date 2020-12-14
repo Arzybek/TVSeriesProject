@@ -159,8 +159,9 @@ public class AuthController {
         System.out.println(token);
         long id = getIdFromJWT(token);
         System.out.println(id);
-        if (id == -1)
+        if (id == -1 || !verifyUser(token))
             return new User("", "anonymous", "anonymous");
+        var user = userService.getUser(id);
         return userService.getUser(id);
 
     }

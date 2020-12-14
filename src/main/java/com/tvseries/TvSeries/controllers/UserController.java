@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.google.gson.Gson;
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.*;
 import com.tvseries.TvSeries.model.Episode;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+import org.json.*;
 
 import javax.sound.midi.Track;
 import java.lang.reflect.Array;
@@ -98,48 +100,40 @@ public class UserController {
 
 
     @PostMapping("/addUserWatchingShow")
-    public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestParam String info)
+    public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestBody String info)
     {
+        info = info.substring(1, info.length()-1);//кавычки убрали
+        info = info.replaceAll("\\\\", "");// убрали слэши, с ними не парсится в JSONObject
         System.out.println("addUserWatchingShow request ");
-        //System.out.println(data);
+        System.out.println(info);
         if (!verifyUser(token)) {
             System.out.println("addUserWatchingShow request: not verified user");
             return false;
         }
+
+        JSONObject obj = new JSONObject(info);
+        String showname = obj.getString("showName");
+        int episodesCount = obj.getInt("episodesCount");
+
+
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
         TvShow show = new TvShow();
         show.setisUserShow(true);
         show.setAuthorID(userID);
-        info = info.substring(1);
-        info = info.substring(0, info.length()-1);
-        info = info.replace("\"", "");
-        var splitted  = info.split(", ");//  очень говнокод, нужно поискать норм либу
-        for (String prop:splitted) {
-            if(prop.startsWith("showName:"))
-            {
-                show.setName(prop.split(": ")[1]);
-            }
-            if (prop.startsWith("episodesCount:"))
-            {
-                int counter = Integer.parseInt(prop.split(": ")[1]);
-                for (int i=0;i<counter;i++)
-                {
-                    Episode ep = new Episode();
-                    ep.setIndex(i);
-                    show.addEpisode(ep);
-                    episodeService.create(ep);//возможно не нужно
-                }
-            }
+        show.setName(showname);
+        for (int i=0;i<episodesCount;i++)
+        {
+            var ep = new Episode(i);
+            show.addEpisode(ep);
+            episodeService.create(ep);//возможно не нужно
         }
         show.setImgLink("100");
         show.setCategory("Added by user");
-        //show.setName(data.get("showName"));
-        //int counter = Integer.parseInt(data.get("episodesCount"));
-        tvShowService.create(show); // нужно сделать отдельную таблицу
+        tvShowService.create(show);
         user.addWatchingShow(show);
         userService.update(user);
-        System.out.println("added");
+        System.out.println("added show "+showname);
         for (Long id:userService.getUser(userID).getWatchingShowsIDs()) {
             System.out.println(id);
         }

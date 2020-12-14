@@ -58,6 +58,11 @@ public class Episode {
         this.index = index;
     }
 
+    public Episode(int index) {
+
+        this.index = index;
+    }
+
     public Long getId() {
         return this.id;
     }
