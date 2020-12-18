@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.google.gson.Gson;
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.*;
 import com.tvseries.TvSeries.model.Episode;
@@ -208,6 +207,55 @@ public class UserController {
         System.out.println(user.getWatchedEpisodes(showID).toString());
         return user.getWatchedEpisodes(showID);
     }
+
+    @GetMapping("/rating")
+    public Float getRating(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return 0F;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        return user.getRating(showID);
+    }
+
+
+    @PostMapping("/rateShow")
+    public void setRating(@RequestParam(required = true) Float rating, @RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        user.addRating(showID, rating);
+
+        userService.update(user);
+    }
+
+
+
+    @GetMapping("/review")
+    public String getReview(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return "no review";
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        return user.getReview(showID);
+    }
+
+
+    @PostMapping("/reviewShow")
+    public void setReview(@RequestBody(required = true) String review, @RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        user.addReview(showID, review);
+        userService.update(user);
+    }
+
 
 
 

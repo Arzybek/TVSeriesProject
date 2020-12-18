@@ -4,6 +4,7 @@ import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +28,12 @@ public class TvShow implements Serializable {
     @OneToMany(targetEntity=Episode.class,  fetch= FetchType.EAGER)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Episode> episodes = new ArrayList<>();
+
+
+    @Column( length = 100000 )
+    private HashMap<Long, Float> ratings = new HashMap<>();
+
+    private Float rating;
 
     //public void setImage(Image image) {
    //     this.image = image;
@@ -165,6 +172,27 @@ public class TvShow implements Serializable {
     {
         return episodes;
     }
+
+    public void addRating(Long userID, Float rating)
+    {
+        ratings.put(userID, rating);
+        var summ = 0F;
+        for (Float rait:ratings.values()) {
+            summ+=rait;
+        }
+        this.rating = summ/ratings.size();
+    }
+
+    public Float getRating()
+    {
+        return rating;
+    }
+
+    public void deleteRating(Long userID)
+    {
+        ratings.remove(userID);
+    }
+
 
     @Override
     public boolean equals(Object o) {

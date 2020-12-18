@@ -19,6 +19,12 @@ public class User {
 
     @Column( length = 100000 )
     private HashMap<Long, Boolean[]> watchingShows = new HashMap<>();
+
+    @Column( length = 100000 )
+    private HashMap<Long, Float> showRatings = new HashMap<>();
+
+    @Column( length = 100000 )
+    private HashMap<Long, String> showReviews = new HashMap<>();
     //private List<TvShow> likedShows = new ArrayList<>();
     //private List<TvShow> featureShows = new ArrayList<>();
     //private List<Comment> comments = new ArrayList<>();
@@ -101,6 +107,31 @@ public class User {
         if (!watchingShows.containsKey(showID))
             return new Boolean[0];
         return watchingShows.get(showID);
+    }
+
+    public void addRating(long showID, Float rating)
+    {
+        showRatings.put(showID, rating);
+    }
+
+    public Float getRating(long showID)
+    {
+        if (!showRatings.containsKey(showID))
+            return 0F;
+        return showRatings.get(showID);
+    }
+
+
+    public void addReview(long showID, String review)
+    {
+        showReviews.put(showID, review);
+    }
+
+    public String getReview(long showID)
+    {
+        if (!showRatings.containsKey(showID))
+            return "no review";
+        return showReviews.get(showID);
     }
 
     /*public void setWatchingShows(List<TvShow> watchingShows) {
