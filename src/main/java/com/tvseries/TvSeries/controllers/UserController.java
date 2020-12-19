@@ -228,7 +228,7 @@ public class UserController {
         User user = userService.getUser(userID);
         TvShow show = tvShowService.read(showID);
         user.addRating(showID, rating);
-
+        show.addRating(userID, rating);
         userService.update(user);
     }
 
@@ -252,7 +252,9 @@ public class UserController {
             return;
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
         user.addReview(showID, review);
+        show.addReview(userID, review);
         userService.update(user);
     }
 

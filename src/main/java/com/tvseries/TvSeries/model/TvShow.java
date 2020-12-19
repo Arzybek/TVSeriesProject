@@ -3,10 +3,7 @@ package com.tvseries.TvSeries.model;
 import org.hibernate.annotations.Cascade;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import javax.persistence.*;
 
@@ -33,7 +30,13 @@ public class TvShow implements Serializable {
     @Column( length = 100000 )
     private HashMap<Long, Float> ratings = new HashMap<>();
 
-    private Float rating;
+    @Column( length = 100000 )
+    private HashMap<Long, String> reviews = new HashMap<>();
+
+    @Column( length = 100000 )
+    private ArrayList<Long> reviewsAuthors = new ArrayList<>();
+
+    private Float rating = 0F;
 
     //public void setImage(Image image) {
    //     this.image = image;
@@ -180,7 +183,10 @@ public class TvShow implements Serializable {
         for (Float rait:ratings.values()) {
             summ+=rait;
         }
-        this.rating = summ/ratings.size();
+        if (ratings.size()==0)
+            this.rating = 0F;
+        else
+            this.rating = summ/ratings.size();
     }
 
     public Float getRating()
@@ -191,6 +197,25 @@ public class TvShow implements Serializable {
     public void deleteRating(Long userID)
     {
         ratings.remove(userID);
+    }
+
+    public void addReview(Long authorID, String review)
+    {
+        this.reviews.put(authorID, review);
+        this.reviewsAuthors.add(authorID);
+    }
+
+    public ArrayList<String> getNRandomReviews(int showAmount)
+    {
+        if (showAmount>reviews.size())
+            showAmount = reviews.size();
+        var output = new ArrayList<String>();
+        Random random = new Random();
+        for(int i=0;i<showAmount;i++) {
+            var author = reviewsAuthors.get(random.nextInt(reviewsAuthors.size()));
+            output.add(reviews.get(author));
+        }
+        return output;
     }
 
 

@@ -25,6 +25,12 @@ class LoadDatabase {
                 ep.setEpisodeName("a"+i);
                 tvShow1.addEpisode(epRepository.save(ep));
             }
+
+            for (int i=0;i<10;i++)
+            {
+                tvShow1.addReview((long) i,  (i)+" aaaa");
+            }
+
             for(int i=1;i<=18;i++)
             {
                 var ep = new Episode(tvShow2.getName(),tvShow2.getId(), i);

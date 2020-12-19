@@ -71,6 +71,21 @@ class TvShowController {
         tvShowService.delete(id);
     }
 
+    @GetMapping("/tvshows/rating")
+    Float getRating(@RequestParam(required = true) long showID)
+    {
+        var show = tvShowService.read(showID);
+        return show.getRating();
+    }
+
+
+    @GetMapping("/tvshows/randomReviews")
+    ArrayList<String> getRandomReviews(@RequestParam(required = true) int amount, @RequestParam(required = true) long showID)
+    {
+        var show = tvShowService.read(showID);
+        return show.getNRandomReviews(amount);
+    }
+
 
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
     public void handleException(Exception ex) {
