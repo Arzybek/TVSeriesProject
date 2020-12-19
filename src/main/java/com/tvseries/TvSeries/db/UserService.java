@@ -60,7 +60,7 @@ public class UserService {
                 .withIgnorePaths("id")
                 .withIgnorePaths("watchingShows")
                 .withMatcher("login", ignoreCase())
-                .withMatcher("passwordHash", ignoreCase()); // нужно сделать без игноркейса
+                .withMatcher("passwordHash", ignoreCase());
 
 
         var test = new User(login, pass);
