@@ -103,4 +103,16 @@ public class UserControllerTests {
         assert !userController.addWatching(randomShow2.getId(), "12345");
     }
 
+    @Test
+    public void TestUserExists(){
+        userService.deleteAll();
+        var user1 = new User("aaa", "bbb");
+        var user1saved = userService.save(user1);
+        var user2 = new User("ccc", "bbb");
+        assert userService.existsById(user1saved.getId());
+        assert userService.existsByLogin(user1saved.getLogin());
+        assert userService.existsByLogin(user1.getLogin());
+        assert !userService.existsByLogin(user2.getLogin());
+    }
+
 }

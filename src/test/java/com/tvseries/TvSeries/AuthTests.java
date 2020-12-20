@@ -5,9 +5,14 @@ import com.tvseries.TvSeries.controllers.AuthController;
 import com.tvseries.TvSeries.db.UserRepository;
 import com.tvseries.TvSeries.common.RSA;
 import com.tvseries.TvSeries.db.UserService;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 public class AuthTests {
@@ -56,21 +61,13 @@ public class AuthTests {
 
 
     @Test
-    public void TestLoginUser() throws Exception {
-        var controller = new AuthController(userService, rsa);
-        String regInfo = "test:1234";
-        var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
-        var token = controller.register(rsaLogPass);
-        var answer = controller.auth(token);
-        assert answer == "hello";
+    public void JsonParserTest() throws JSONException {
+        var tokenPayload = "{\"iss\":\"Issuer\",\"id\":33,\"user\":\"123\"}";
+        tokenPayload = tokenPayload.replaceAll("\\\\", "");// убрали слэши, с ними не парсится в JSONObject
+        JSONObject obj = new JSONObject(tokenPayload);
+        Long id = obj.getLong("id");
+        assert id == 33;
     }
 
 
-    @Test
-    public void TestLoginInvalidUser() throws Exception {
-        var controller = new AuthController(userService, rsa);
-        var token = "TABURETH";
-        var answer = controller.auth(token);
-        assert answer == "you are not logged in";
-    }
 }
