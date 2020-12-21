@@ -29,8 +29,6 @@ public class UserService {
     private UserRepository repository;
 
     public User save(User user) {
-        //repository.delete(user);
-        //return repository.sa
         return repository.save(user);
     }
 
@@ -46,7 +44,7 @@ public class UserService {
 
 
     public User update(User user) {
-        return repository.save(user); // возможно стоит именно  апдейтить
+        return repository.save(user);
     }
 
     public void delete(Long id) {

@@ -48,10 +48,10 @@ public class AuthController {
         return rsa.getPublicKey().toString();
     }
 
-    @PostMapping("/register/insecure")
-    public String insecureRegister(@CookieValue("register") String RSAlogpass) {
-        System.out.println("insecure-register: " + RSAlogpass);
-        var regInfo = RSAlogpass.split(":");
+    @PostMapping("/register/insecure")  // регистрация без использования RSA
+    public String insecureRegister(@CookieValue("register") String logPass) {
+        System.out.println("insecure-register: " + logPass);
+        var regInfo = logPass.split(":");
         var login = regInfo[0];
         var password = regInfo[1];
 
@@ -76,8 +76,8 @@ public class AuthController {
                 }
                 else
                 {
-                    System.out.println("wrong password???"); // пользователь существует но пароль неверный
-                    return "";  // вернули пустую куку, надо на фронте бы интеллектуально обработать это
+                    System.out.println("wrong password"); // пользователь существует но пароль неверный
+                    return "";  // вернули пустую куку ToDO: как то обработать на фронте
                 }
             }
             else
@@ -87,13 +87,11 @@ public class AuthController {
             }
 
             Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
-            String token = JWT.create()
+            String token = JWT.create()  // TODO: заменить passHash приватным ключом сервера
                     .withIssuer("Issuer")
                     .withClaim("user", login)
                     .withClaim("id", id)
                     .sign(algorithm);
-
-            System.out.println(getIdFromJWT(token));
             return token;
         } catch (JWTCreationException exception) {
             return "";
@@ -105,7 +103,6 @@ public class AuthController {
     public String register(@CookieValue("register") String RSAlogpass) {
         String decrypted;
         try {
-            //System.out.println(RSAlogpass);
             decrypted = rsa.decrypt(RSAlogpass, rsa.getPrivateKey());
             System.out.println(decrypted);
         } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
@@ -130,7 +127,7 @@ public class AuthController {
         byte[] digest = md.digest();
         String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         try {
-            var newUser = new User(regInfo[0], regInfo[0], passHash);
+            var newUser = new User(login, login, passHash);
             //newUser.setName(regInfo[0]);
             //newUser.setPasswordHash(passHash);
             var saved = userService.save(newUser);
@@ -153,9 +150,7 @@ public class AuthController {
 
     @GetMapping("/profile")
     User getProfile(@CookieValue("auth") String token) {
-        System.out.println(token);
         long id = getIdFromJWT(token);
-        System.out.println(id);
         if (id == -1 || !verifyUser(token))
             return new User("", "anonymous", "anonymous");
         return userService.getUser(id);
@@ -185,7 +180,7 @@ public class AuthController {
                     .withClaim("user", login)
                     .withClaim("id", idDB)
                     .build();
-            DecodedJWT jwt = verifier.verify(token);
+            verifier.verify(token);
         } catch (JWTVerificationException exception) {
             return false;
         }
@@ -201,8 +196,7 @@ public class AuthController {
         token_parsed = token_parsed.replaceAll("\\\\", "");// убрали слэши, с ними не парсится в JSONObject
         JSONObject obj = new JSONObject(token_parsed);
         try {
-            Long id = obj.getLong("id");
-            return id;
+            return obj.getLong("id");
         }
         catch (JSONException e)
         {
@@ -214,7 +208,6 @@ public class AuthController {
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
     public void handleException(Exception ex) {
         System.out.println(ex.getStackTrace().toString());
-        //
     }
 
 

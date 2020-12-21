@@ -39,8 +39,6 @@ public class UserController {
         this.episodeService = episodeService;
     }
 
-    // Aggregate root
-
     @GetMapping("/watching")
     public List<TvShow> watching(@RequestParam(value = "q", required = false) Integer perPage,
                      @RequestParam(value = "page", required = false) Integer page, @CookieValue("auth") String token) {
@@ -101,7 +99,7 @@ public class UserController {
     @PostMapping("/addUserWatchingShow")
     public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestBody String info)
     {
-        info = info.substring(1, info.length()-1);//кавычки убрали
+        //info = info.substring(1, info.length()-1);//кавычки убрали
         info = info.replaceAll("\\\\", "");// убрали слэши, с ними не парсится в JSONObject
         System.out.println("addUserWatchingShow request ");
         System.out.println(info);
@@ -125,17 +123,14 @@ public class UserController {
         {
             var ep = new Episode(i);
             show.addEpisode(ep);
-            episodeService.create(ep);//возможно не нужно
+            episodeService.create(ep);//возможно не нужно TODO проверить нужно ли
         }
-        show.setImgLink("100");
+        show.setImgLink("100");  // стаб картинка для userShow
         show.setCategory("Added by user");
         tvShowService.create(show);
         user.addWatchingShow(show);
         userService.update(user);
         System.out.println("added show "+showname);
-        for (Long id:userService.getUser(userID).getWatchingShowsIDs()) {
-            System.out.println(id);
-        }
         return true;
     }
 
@@ -150,8 +145,6 @@ public class UserController {
         System.out.println("watch episode request"+showID+epID);
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        Episode ep = episodeService.getOne(epID);
         user.watchEpisode(showID, epID);
         userService.save(user);
         return true;
@@ -181,7 +174,6 @@ public class UserController {
         }
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        System.out.println(user.getWatchingShowsIDs().contains(showID));
         return user.getWatchingShowsIDs().contains(showID);
     }
 
@@ -199,7 +191,7 @@ public class UserController {
     @GetMapping("/watchedEpisodes")
     public Boolean[] getWatchedEpisodes(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
-        System.out.println("watched episodes request");
+        System.out.println("get watched episodes request");
         if (!verifyUser(token))
             return new Boolean[0];
         long userID = AuthController.getIdFromJWT(token);
@@ -285,7 +277,7 @@ public class UserController {
                     .withClaim("user", login)
                     .withClaim("id", idDB)
                     .build();
-            DecodedJWT jwt = verifier.verify(token);
+            verifier.verify(token);
         } catch (JWTVerificationException exception) {
             return false;
         }
@@ -296,7 +288,6 @@ public class UserController {
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
     public void handleException(Exception ex) {
         System.out.println(ex.getStackTrace().toString());
-        //
     }
 
 

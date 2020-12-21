@@ -37,8 +37,25 @@ public class User {
     private int age;
     private String login;
     private String photoLink;
+    private String passwordHash;
 
     public User(){}
+
+
+    public User(String login, String passwordHash) {
+        this.name = "logged anonymous";
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
+    }
+
+    public User(String name, String login, String passwordHash) {
+        this.name = name;
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg"; // TODO сделать на сервере картинку для юзера
+    }
+
 
     public String getLogin() {
         return login;
@@ -134,26 +151,6 @@ public class User {
         return showReviews.get(showID);
     }
 
-    /*public void setWatchingShows(List<TvShow> watchingShows) {
-        this.watchingShows = watchingShows;
-    }
-
-    public List<TvShow> getLikedShows() {
-        return likedShows;
-    }
-
-    public void setLikedShows(List<TvShow> likedShows) {
-        this.likedShows = likedShows;
-    }*/
-
-    //public List<TvShow> getFeatureShows() {
-    //    return featureShows;
-    //}
-
-    //public void setFeatureShows(List<TvShow> featureShows) {
-    //    this.featureShows = featureShows;
-    //}
-
     public String getDescription() {
         return description;
     }
@@ -178,24 +175,8 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    private String passwordHash;
-
     public String getPhotoLink(){
         return this.photoLink;
     }
 
-
-    public User(String login, String passwordHash) {
-        this.name = "logged anon";
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
-    }
-
-    public User(String name, String login, String passwordHash) {
-        this.name = name;
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
-    }
 }
