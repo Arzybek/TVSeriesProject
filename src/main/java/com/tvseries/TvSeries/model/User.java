@@ -146,7 +146,7 @@ public class User {
 
     public String getReview(long showID)
     {
-        if (!showRatings.containsKey(showID))
+        if (!showReviews.containsKey(showID))
             return "no review";
         return showReviews.get(showID);
     }
