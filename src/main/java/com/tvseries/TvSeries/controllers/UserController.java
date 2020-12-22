@@ -123,7 +123,7 @@ public class UserController {
         {
             var ep = new Episode(i);
             show.addEpisode(ep);
-            episodeService.create(ep);//возможно не нужно TODO проверить нужно ли
+            episodeService.create(ep);
         }
         show.setImgLink("100");  // стаб картинка для userShow
         show.setCategory("Added by user");
@@ -271,7 +271,7 @@ public class UserController {
             return false;
         }
         try {
-            Algorithm algorithm = Algorithm.HMAC256(passHash);
+            Algorithm algorithm = Algorithm.HMAC256(AuthController.getHmac());
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Issuer")
                     .withClaim("user", login)

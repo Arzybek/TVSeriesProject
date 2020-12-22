@@ -46,14 +46,14 @@ public class User {
         this.name = "logged anonymous";
         this.login = login;
         this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
+        this.photoLink = "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
     }
 
     public User(String name, String login, String passwordHash) {
         this.name = name;
         this.login = login;
         this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg"; // TODO сделать на сервере картинку для юзера
+        this.photoLink = "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
     }
 
 

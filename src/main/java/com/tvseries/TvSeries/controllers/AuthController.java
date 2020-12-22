@@ -35,6 +35,7 @@ public class AuthController {
 
     private RSA rsa;
     private final UserService userService;
+    private static final String hmacPrivateKey = "&E)H@McQfTjWnZr4u7x!A%D*F-JaNdRg";  // TODO стоит вынести в конфиги
 
     public AuthController(UserService userService, RSA rsa) {
         this.rsa = rsa;
@@ -77,7 +78,7 @@ public class AuthController {
                 else
                 {
                     System.out.println("wrong password"); // пользователь существует но пароль неверный
-                    return "";  // вернули пустую куку ToDO: как то обработать на фронте
+                    return "ERROR";  // маркер ошибки авторизации
                 }
             }
             else
@@ -86,8 +87,8 @@ public class AuthController {
                 id = saved.getId();
             }
 
-            Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
-            String token = JWT.create()  // TODO: заменить passHash приватным ключом сервера
+            Algorithm algorithm = Algorithm.HMAC256(hmacPrivateKey); // возвращаем токен для последующей аутентификации
+            String token = JWT.create()
                     .withIssuer("Issuer")
                     .withClaim("user", login)
                     .withClaim("id", id)
@@ -174,7 +175,7 @@ public class AuthController {
             return false;
         }
         try {
-            Algorithm algorithm = Algorithm.HMAC256(passHash);
+            Algorithm algorithm = Algorithm.HMAC256(hmacPrivateKey);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Issuer")
                     .withClaim("user", login)
@@ -202,6 +203,11 @@ public class AuthController {
         {
             return -1;
         }
+    }
+
+    public static String getHmac()
+    {
+        return hmacPrivateKey;
     }
 
 
