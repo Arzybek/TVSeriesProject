@@ -18,6 +18,24 @@ public class Episode {
     private String description;
     private int watcherCount;
 
+    public Episode ()
+    {
+
+    }
+
+    public Episode(String show, long showID, int index) {
+
+        this.show = show;
+        this.showID = showID;
+        this.index = index;
+    }
+
+
+    public Episode(int index) {
+
+        this.index = index;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -43,21 +61,6 @@ public class Episode {
         return this.index;
     }
 
-
-    //private List<Comment> comments = new ArrayList();
-
-    public Episode ()
-    {
-
-    }
-
-    public Episode(String show, long showID, int index) {
-
-        this.show = show;
-        this.showID = showID;
-        this.index = index;
-    }
-
     public Long getId() {
         return this.id;
     }
@@ -76,6 +79,10 @@ public class Episode {
 
     public void setShow(String show) {
         this.show = show;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
 

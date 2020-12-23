@@ -13,11 +13,13 @@ import com.tvseries.TvSeries.model.TvShow;
 import com.tvseries.TvSeries.model.User;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+import org.json.*;
 
 import javax.sound.midi.Track;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 
 @RestController
 @ComponentScan("com.tvseries.TvSeries.common")
@@ -36,8 +38,6 @@ public class UserController {
         this.userService = userService;
         this.episodeService = episodeService;
     }
-
-    // Aggregate root
 
     @GetMapping("/watching")
     public List<TvShow> watching(@RequestParam(value = "q", required = false) Integer perPage,
@@ -96,6 +96,47 @@ public class UserController {
     }
 
 
+    @PostMapping("/addUserWatchingShow")
+    public Boolean addUserWatchingShow(@CookieValue("auth") String token, @RequestBody String info)
+    {
+        //info = info.substring(1, info.length()-1);//кавычки убрали
+        info = info.replaceAll("\\\\", "");// убрали слэши, с ними не парсится в JSONObject
+        System.out.println("addUserWatchingShow request ");
+        System.out.println(info);
+        if (!verifyUser(token)) {
+            System.out.println("addUserWatchingShow request: not verified user");
+            return false;
+        }
+
+        JSONObject obj = new JSONObject(info);
+        String showname = obj.getString("showName");
+        int episodesCount = obj.getInt("episodesCount");
+
+
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = new TvShow();
+        show.setisUserShow(true);
+        show.setAuthorID(userID);
+        show.setName(showname);
+        for (int i=0;i<episodesCount;i++)
+        {
+            var ep = new Episode(i);
+            show.addEpisode(ep);
+            episodeService.create(ep);
+        }
+        show.setImgLink("100");  // стаб картинка для userShow
+        show.setCategory("Added by user");
+        tvShowService.create(show);
+        user.addWatchingShow(show);
+        userService.update(user);
+        System.out.println("added show "+showname);
+        return true;
+    }
+
+
+
+
     @PostMapping("/watchEpisode")
     public Boolean watchEpisode(@RequestParam(required = true) long showID, @RequestParam(required = true) long epID,  @CookieValue("auth") String token)
     {
@@ -104,8 +145,6 @@ public class UserController {
         System.out.println("watch episode request"+showID+epID);
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        TvShow show = tvShowService.read(showID);
-        Episode ep = episodeService.getOne(epID);
         user.watchEpisode(showID, epID);
         userService.save(user);
         return true;
@@ -135,7 +174,6 @@ public class UserController {
         }
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
-        System.out.println(user.getWatchingShowsIDs().contains(showID));
         return user.getWatchingShowsIDs().contains(showID);
     }
 
@@ -153,19 +191,66 @@ public class UserController {
     @GetMapping("/watchedEpisodes")
     public Boolean[] getWatchedEpisodes(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
+        System.out.println("get watched episodes request");
         if (!verifyUser(token))
-            return null;
+            return new Boolean[0];
         long userID = AuthController.getIdFromJWT(token);
         User user = userService.getUser(userID);
+        System.out.println(user.getWatchedEpisodes(showID).toString());
         return user.getWatchedEpisodes(showID);
     }
 
+    @GetMapping("/rating")
+    public Float getRating(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return 0F;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        return user.getRating(showID);
+    }
 
 
+    @PostMapping("/rateShow")
+    public void setRating(@RequestParam(required = true) Float rating, @RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        user.addRating(showID, rating);
+        show.addRating(userID, rating);
+        userService.update(user);
+    }
 
-    public boolean verifyUser(String token) {
-        // здесь надо выпарсить имя юзера из токена и найти его пароль в базе данных (или можно хранить в базе токен)
 
+    @GetMapping("/review")
+    public String getReview(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return "no review";
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        return user.getReview(showID);
+    }
+
+
+    @PostMapping("/reviewShow")
+    public void setReview(@RequestBody(required = true) String review, @RequestParam(required = true) long showID, @CookieValue("auth") String token)
+    {
+        if (!verifyUser(token))
+            return;
+        long userID = AuthController.getIdFromJWT(token);
+        User user = userService.getUser(userID);
+        TvShow show = tvShowService.read(showID);
+        user.addReview(showID, review);
+        show.addReview(userID, review);
+        userService.update(user);
+    }
+
+    public boolean verifyUser(String token)
+    {
         long id = AuthController.getIdFromJWT(token);
         if (id == -1 || !userService.existsById(id))
             return false;
@@ -181,17 +266,23 @@ public class UserController {
             return false;
         }
         try {
-            Algorithm algorithm = Algorithm.HMAC256(passHash);
+            Algorithm algorithm = Algorithm.HMAC256(AuthController.getHmac());
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("Issuer")
                     .withClaim("user", login)
                     .withClaim("id", idDB)
                     .build();
-            DecodedJWT jwt = verifier.verify(token);
+            verifier.verify(token);
         } catch (JWTVerificationException exception) {
             return false;
         }
         return true;
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
     }
 
 

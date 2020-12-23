@@ -19,6 +19,12 @@ public class User {
 
     @Column( length = 100000 )
     private HashMap<Long, Boolean[]> watchingShows = new HashMap<>();
+
+    @Column( length = 100000 )
+    private HashMap<Long, Float> showRatings = new HashMap<>();
+
+    @Column( length = 100000 )
+    private HashMap<Long, String> showReviews = new HashMap<>();
     //private List<TvShow> likedShows = new ArrayList<>();
     //private List<TvShow> featureShows = new ArrayList<>();
     //private List<Comment> comments = new ArrayList<>();
@@ -31,8 +37,25 @@ public class User {
     private int age;
     private String login;
     private String photoLink;
+    private String passwordHash;
 
     public User(){}
+
+
+    public User(String login, String passwordHash) {
+        this.name = "logged anonymous";
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.photoLink = "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
+    }
+
+    public User(String name, String login, String passwordHash) {
+        this.name = name;
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.photoLink = "https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg";
+    }
+
 
     public String getLogin() {
         return login;
@@ -99,29 +122,34 @@ public class User {
     public Boolean[] getWatchedEpisodes(Long showID)
     {
         if (!watchingShows.containsKey(showID))
-            return null;
+            return new Boolean[0];
         return watchingShows.get(showID);
     }
 
-    /*public void setWatchingShows(List<TvShow> watchingShows) {
-        this.watchingShows = watchingShows;
+    public void addRating(long showID, Float rating)
+    {
+        showRatings.put(showID, rating);
     }
 
-    public List<TvShow> getLikedShows() {
-        return likedShows;
+    public Float getRating(long showID)
+    {
+        if (!showRatings.containsKey(showID))
+            return 0F;
+        return showRatings.get(showID);
     }
 
-    public void setLikedShows(List<TvShow> likedShows) {
-        this.likedShows = likedShows;
-    }*/
 
-    //public List<TvShow> getFeatureShows() {
-    //    return featureShows;
-    //}
+    public void addReview(long showID, String review)
+    {
+        showReviews.put(showID, review);
+    }
 
-    //public void setFeatureShows(List<TvShow> featureShows) {
-    //    this.featureShows = featureShows;
-    //}
+    public String getReview(long showID)
+    {
+        if (!showReviews.containsKey(showID))
+            return "no review";
+        return showReviews.get(showID);
+    }
 
     public String getDescription() {
         return description;
@@ -147,24 +175,8 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    private String passwordHash;
-
     public String getPhotoLink(){
         return this.photoLink;
     }
 
-
-    public User(String login, String passwordHash) {
-        this.name = "logged anon";
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
-    }
-
-    public User(String name, String login, String passwordHash) {
-        this.name = name;
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.photoLink = "https://i.imgur.com/oCVNMVX.jpg";
-    }
 }

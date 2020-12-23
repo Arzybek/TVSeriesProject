@@ -1,8 +1,7 @@
 package com.tvseries.TvSeries.controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.TvShowRepository;
@@ -13,6 +12,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -28,16 +29,29 @@ class TvShowController {
     // Aggregate root
 
     @GetMapping("/tvshows")
-    List<TvShow> all(@RequestParam(value = "q", required = false) Integer perPage,
+    List<List<TvShow>> all(@RequestParam(value = "q", required = false) Integer perPage,
                      @RequestParam(value = "page", required = false) Integer page) {
         List<TvShow> allShows = tvShowService.findAll();
+        ArrayList<List<TvShow>> res = new ArrayList<List<TvShow>>();
         if(perPage!=null){
-            if(page==null)
-                page = 1;
-            ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAll(page-1, perPage);
-            return pages;
+            if(page==null) {
+                ArrayList<List<TvShow>> pages = (ArrayList<List<TvShow>>)ListUtils.partition(allShows, perPage);
+                return pages;
+            }
+            ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAllExceptCustom(page-1, perPage);
+            res.add(pages);
+            return res;
         }
-        else return tvShowService.findAll();
+        res.add(allShows);
+        return res;
+    }
+
+    @GetMapping("/tvshows/search")
+    List<List<TvShow>> search (@RequestParam(value = "q", required = false) String query) {
+        List<TvShow> allShows = tvShowService.searchByName(query);
+        ArrayList<List<TvShow>> res = new ArrayList<List<TvShow>>();
+        res.add(allShows);
+        return res;
     }
 
     @PostMapping("/tvshows")
@@ -67,6 +81,28 @@ class TvShowController {
     @DeleteMapping("/tvshows/{id}")
     void deleteTvShow(@PathVariable Long id) {
         tvShowService.delete(id);
+    }
+
+    @GetMapping("/tvshows/rating")
+    Float getRating(@RequestParam(required = true) long showID)
+    {
+        var show = tvShowService.read(showID);
+        return show.getRating();
+    }
+
+
+    @GetMapping("/tvshows/randomReviews")
+    ArrayList<String> getRandomReviews(@RequestParam(required = true) int amount, @RequestParam(required = true) long showID)
+    {
+        var show = tvShowService.read(showID);
+        return show.getNRandomReviews(amount);
+    }
+
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class})
+    public void handleException(Exception ex) {
+        System.out.println(ex.getStackTrace().toString());
+        //
     }
 
 }

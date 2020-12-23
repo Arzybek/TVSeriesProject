@@ -5,6 +5,8 @@ import com.tvseries.TvSeries.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -13,6 +15,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.caseSensitive;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
 @Repository
@@ -26,8 +29,6 @@ public class UserService {
     private UserRepository repository;
 
     public User save(User user) {
-        //repository.delete(user);
-        //return repository.sa
         return repository.save(user);
     }
 
@@ -43,7 +44,7 @@ public class UserService {
 
 
     public User update(User user) {
-        return repository.save(user); // возможно стоит именно  апдейтить
+        return repository.save(user);
     }
 
     public void delete(Long id) {
@@ -54,23 +55,25 @@ public class UserService {
         return repository.existsById(id);
     }
 
-    public Boolean existsByLogPass(String login, String pass){
+    public Boolean existsByLogin(String login){
 
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withIgnorePaths("id")
-                .withIgnorePaths("watchingShows")
-                .withMatcher("login", ignoreCase())
-                .withMatcher("passwordHash", ignoreCase()); // нужно сделать без игноркейса
+        return repository.existsByLogin(login);
 
-
-        var test = new User(login, pass);
-        Example<User> example = Example.of(test, matcher);
-        var aaa = repository.exists(example);
-        return repository.exists(example);
     }
 
 
-    public User getByLogPass(String login, String pass){
+
+    public Boolean existsByLoginPassHash(String login, String passHash){
+
+        return repository.existsByLoginAndPasswHash(login, passHash);
+    }
+
+
+
+    public User getByLoginPasshash(String login, String passHash){
+
+        if (!existsByLoginPassHash(login, passHash))
+            return null;
 
         ExampleMatcher matcher = ExampleMatcher.matchingAny()
                 .withIgnorePaths("id")
@@ -78,7 +81,7 @@ public class UserService {
                 .withMatcher("passwordHash", ignoreCase());
 
 
-        var test = new User(login, login, pass);
+        var test = new User(login, login, passHash);
         Example<User> example = Example.of(test, matcher);
         return repository.findOne(example).get();
     }

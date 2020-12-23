@@ -28,6 +28,10 @@ public class TvShowService {
         return repository.findById(id).orElseThrow(() -> new RuntimeException(""+id));
     }
 
+    public List<TvShow> searchByName (String name) {
+//        return repository.findTvShowByName(name);
+        return repository.findTvShowByNameContainingIgnoreCase(name);
+    }
 
     public TvShow update(TvShow tvShow) {
         return repository.findById(tvShow.getId())
@@ -47,7 +51,22 @@ public class TvShowService {
     }
 
     public List<TvShow> findAll(){
-        return repository.findAll();
+
+        TypedQuery query = em.createQuery("select c from TvShow c", TvShow.class);
+
+        return query.getResultList();
+
+        //return repository.findAll();
+    }
+
+    public List<TvShow> findAllExceptCustom(int page, int pageSize) {
+
+        TypedQuery query = em.createQuery("select c from TvShow c WHERE c.isUserShow = FALSE", TvShow.class);
+
+        query.setFirstResult(page * pageSize);
+        query.setMaxResults(pageSize);
+
+        return query.getResultList();
     }
 
     public List<TvShow> findAll(int page, int pageSize) {
