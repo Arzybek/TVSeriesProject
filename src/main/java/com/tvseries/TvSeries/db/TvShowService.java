@@ -29,7 +29,8 @@ public class TvShowService {
     }
 
     public List<TvShow> searchByName (String name) {
-        return repository.findTvShowByName(name);
+//        return repository.findTvShowByName(name);
+        return repository.findTvShowByNameContainingIgnoreCase(name);
     }
 
     public TvShow update(TvShow tvShow) {

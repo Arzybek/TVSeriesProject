@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface TvShowRepository extends JpaRepository<TvShow, Long> {
     List<TvShow> findTvShowByName(String name);
+    List<TvShow> findTvShowByNameContainingIgnoreCase(String name);
 }
