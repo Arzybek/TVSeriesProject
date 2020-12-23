@@ -27,9 +27,9 @@ class LoadDatabase {
                 ep.setEpisodeName("a"+i);
                 tvShow1.addEpisode(epRepository.save(ep));
             }
-            for (int i=0;i<10;i++)
+            for (int i=0;i<6;i++)
             {
-                tvShow1.addReview((long) i,  (i)+" aaaa");
+                tvShow1.addReview((long) i,  (i)+" test review");
             }
 
             var tvShow2 = repository.save(new TvShow("Friends", "comedy", 1994, "2"));
@@ -45,6 +45,20 @@ class LoadDatabase {
             log.info("Preloading " + repository.save(tvShow2));
             log.info("Preloading " + repository.save(new TvShow("The Middle", "sitcom,", 2009, "3")));
             log.info("Preloading " + repository.save(new TvShow("New Girl", "sitcom", 2011, "4")));
+            log.info("Preloading " + repository.save(new TvShow("Mandolorian", "Sci-Fi", 2019, "6")));
+
+            var naruto = repository.save(new TvShow("Naruto", "anime", 2002, "5"));
+                    naruto.setDescription("Легендарное аниме");
+
+            for(int i=1;i<=220;i++)
+            {
+                var ep = new Episode(naruto.getName(), naruto.getId(), i);
+                ep.setEpisodeName("n"+i);
+                naruto.addEpisode(epRepository.save(ep));
+            }
+
+            log.info("EpisodesCount "+repository.findById(naruto.getId()).get().getEpisodes().size());
+            log.info("Preloading " + repository.save(naruto));
         };
     }
 }
