@@ -1,8 +1,7 @@
 package com.tvseries.TvSeries.controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.tvseries.TvSeries.common.ListUtils;
 import com.tvseries.TvSeries.db.TvShowRepository;
@@ -30,16 +29,29 @@ class TvShowController {
     // Aggregate root
 
     @GetMapping("/tvshows")
-    List<TvShow> all(@RequestParam(value = "q", required = false) Integer perPage,
+    List<List<TvShow>> all(@RequestParam(value = "q", required = false) Integer perPage,
                      @RequestParam(value = "page", required = false) Integer page) {
         List<TvShow> allShows = tvShowService.findAll();
+        ArrayList<List<TvShow>> res = new ArrayList<List<TvShow>>();
         if(perPage!=null){
-            if(page==null)
-                page = 1;
+            if(page==null) {
+                ArrayList<List<TvShow>> pages = (ArrayList<List<TvShow>>)ListUtils.partition(allShows, perPage);
+                return pages;
+            }
             ArrayList<TvShow> pages = (ArrayList<TvShow>) tvShowService.findAllExceptCustom(page-1, perPage);
-            return pages;
+            res.add(pages);
+            return res;
         }
-        else return tvShowService.findAll();
+        res.add(allShows);
+        return res;
+    }
+
+    @GetMapping("/tvshows/search")
+    List<List<TvShow>> search (@RequestParam(value = "q", required = false) String query) {
+        List<TvShow> allShows = tvShowService.searchByName(query);
+        ArrayList<List<TvShow>> res = new ArrayList<List<TvShow>>();
+        res.add(allShows);
+        return res;
     }
 
     @PostMapping("/tvshows")

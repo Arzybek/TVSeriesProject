@@ -225,7 +225,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/review")
     public String getReview(@RequestParam(required = true) long showID, @CookieValue("auth") String token)
     {
@@ -249,10 +248,6 @@ public class UserController {
         show.addReview(userID, review);
         userService.update(user);
     }
-
-
-
-
 
     public boolean verifyUser(String token)
     {

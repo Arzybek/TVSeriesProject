@@ -15,12 +15,11 @@ public class TvShow implements Serializable {
     private String category;
     private int year;
     private String imgLink;
+    @Lob
     private String description;
     private int watcherCount;
     private Boolean isUserShow = false;
     private Long authorID;
-
-
 
     @OneToMany(targetEntity=Episode.class,  fetch= FetchType.EAGER)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)

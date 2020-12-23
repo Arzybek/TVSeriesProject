@@ -28,6 +28,9 @@ public class TvShowService {
         return repository.findById(id).orElseThrow(() -> new RuntimeException(""+id));
     }
 
+    public List<TvShow> searchByName (String name) {
+        return repository.findTvShowByName(name);
+    }
 
     public TvShow update(TvShow tvShow) {
         return repository.findById(tvShow.getId())
