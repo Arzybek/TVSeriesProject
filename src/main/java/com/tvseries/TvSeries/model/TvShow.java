@@ -206,13 +206,20 @@ public class TvShow implements Serializable {
 
     public ArrayList<String> getNRandomReviews(int showAmount)
     {
+        var alreadyGot = new HashSet<Long>();
         if (showAmount>reviews.size())
             showAmount = reviews.size();
         var output = new ArrayList<String>();
         Random random = new Random();
-        for(int i=0;i<showAmount;i++) {
+        int i=0;
+        while (i<showAmount)
+        {
             var author = reviewsAuthors.get(random.nextInt(reviewsAuthors.size()));
+            if (alreadyGot.contains(author))
+                continue;
             output.add(reviews.get(author));
+            alreadyGot.add(author);
+            i++;
         }
         return output;
     }
