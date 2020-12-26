@@ -102,6 +102,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@CookieValue("register") String RSAlogpass) {
+        System.out.println(RSAlogpass);
         String decrypted;
         try {
             decrypted = rsa.decrypt(RSAlogpass, rsa.getPrivateKey());
@@ -111,7 +112,7 @@ public class AuthController {
             return "";
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return "ERROR";
         }
         var regInfo = decrypted.split(":");
         var login = regInfo[0];
@@ -144,7 +145,7 @@ public class AuthController {
             System.out.println(getIdFromJWT(token));
             return token;
         } catch (JWTCreationException exception) {
-            return "";
+            return "ERROR";
         }
     }
 
