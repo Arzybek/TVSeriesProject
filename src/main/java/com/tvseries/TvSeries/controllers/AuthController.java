@@ -95,7 +95,7 @@ public class AuthController {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            return "";
+            return "ERROR";
         }
     }
 
@@ -106,12 +106,15 @@ public class AuthController {
         String decrypted;
         try {
             decrypted = rsa.decrypt(RSAlogpass, rsa.getPrivateKey());
-            System.out.println(decrypted);
-        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            System.out.println("decrypted: "+decrypted);
+        } catch (IllegalBlockSizeException |
+                InvalidKeyException |
+                NoSuchAlgorithmException |
+                NoSuchPaddingException |
+                BadPaddingException e) {
             e.printStackTrace();
-            return "";
+            return "ERROR";
         } catch (Exception e) {
-            e.printStackTrace();
             return "ERROR";
         }
         var regInfo = decrypted.split(":");
@@ -130,19 +133,31 @@ public class AuthController {
         String passHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         try {
             var newUser = new User(login, login, passHash);
-            //newUser.setName(regInfo[0]);
-            //newUser.setPasswordHash(passHash);
-            var saved = userService.save(newUser);
-            long id = saved.getId();
+            long id;
+            if (userService.existsByLogin(login)) {
+                if (userService.existsByLoginPassHash(login, passHash))
+                {
+                    var user = userService.getByLoginPasshash(login, passHash);
+                    id = user.getId();  // пользователь существует и пароль верный
+                }
+                else
+                {
+                    System.out.println("wrong password"); // пользователь существует но пароль неверный
+                    return "ERROR";  // маркер ошибки авторизации
+                }
+            }
+            else
+            {
+                var saved = userService.save(newUser);  // пользователя не существовало, создаем
+                id = saved.getId();
+            }
 
-            Algorithm algorithm = Algorithm.HMAC256(passHash); // возвращаем токен для последующей аутентификации
+            Algorithm algorithm = Algorithm.HMAC256(hmacPrivateKey); // возвращаем токен для последующей аутентификации
             String token = JWT.create()
                     .withIssuer("Issuer")
-                    .withClaim("user", regInfo[0])
+                    .withClaim("user", login)
                     .withClaim("id", id)
                     .sign(algorithm);
-
-            System.out.println(getIdFromJWT(token));
             return token;
         } catch (JWTCreationException exception) {
             return "ERROR";
