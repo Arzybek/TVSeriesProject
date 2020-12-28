@@ -122,6 +122,7 @@ public class UserController {
         for (int i=0;i<episodesCount;i++)
         {
             var ep = new Episode(i);
+            ep.setEpisodeName("ep"+i);
             show.addEpisode(ep);
             episodeService.create(ep);
         }

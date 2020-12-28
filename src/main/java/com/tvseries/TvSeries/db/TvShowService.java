@@ -59,6 +59,14 @@ public class TvShowService {
         //return repository.findAll();
     }
 
+
+    public List<TvShow> findAllExceptCustom() {
+
+        TypedQuery query = em.createQuery("select c from TvShow c WHERE c.isUserShow = FALSE", TvShow.class);
+
+        return query.getResultList();
+    }
+
     public List<TvShow> findAllExceptCustom(int page, int pageSize) {
 
         TypedQuery query = em.createQuery("select c from TvShow c WHERE c.isUserShow = FALSE", TvShow.class);

@@ -43,7 +43,7 @@ public class AuthTests {
         var rsaLogPass = RSA.encrypt(regInfo, rsa.getPublicKey());
         var token = controller.register(rsaLogPass);
         //System.out.println(token);
-        long id = controller.getIdFromJWT(token);
+        long id = AuthController.getIdFromJWT(token);
         System.out.println(id);
         assert controller.verifyUser(token);
     }
@@ -56,7 +56,7 @@ public class AuthTests {
         var token = controller.register(rsaLogPass);
         //token = token.replace("\n", "");
         long id = controller.getIdFromJWT(token);
-        assert id == 3;
+        assert id == 255;
     }
 
 

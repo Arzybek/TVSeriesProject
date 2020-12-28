@@ -31,7 +31,7 @@ class TvShowController {
     @GetMapping("/tvshows")
     List<List<TvShow>> all(@RequestParam(value = "q", required = false) Integer perPage,
                      @RequestParam(value = "page", required = false) Integer page) {
-        List<TvShow> allShows = tvShowService.findAll();
+        List<TvShow> allShows = tvShowService.findAllExceptCustom();
         ArrayList<List<TvShow>> res = new ArrayList<List<TvShow>>();
         if(perPage!=null){
             if(page==null) {
