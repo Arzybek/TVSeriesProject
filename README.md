@@ -7,9 +7,9 @@ https://github.com/Arzybek/TVSeriesAndroidKotlin.
 * Screenshots:
 
 <p float="left">
-    <img width="30%" src="/screenshots/1.png">
-    <img src="/screenshots/2.png" width="30%">
-    <img src="/screenshots/3.png" width="30%">
+    <img width="32%" src="/screenshots/1.png">
+    <img src="/screenshots/2.png" width="32%">
+    <img src="/screenshots/3.png" width="32%">
 </p>
 <p float="left">
     <img width="32%" src="/screenshots/4.png">
