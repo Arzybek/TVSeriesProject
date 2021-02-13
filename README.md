@@ -6,17 +6,11 @@
 https://github.com/Arzybek/TVSeriesAndroidKotlin.
 * Screenshots:
 
-<div class="row">
-  <div class="column">
+<p float="left">
     <img width="30%" src="/screenshots/1.png">
-  </div>
-  <div class="column">
     <img src="/screenshots/2.png" width="30%">
-  </div>
-  <div class="column">
     <img src="/screenshots/3.png" width="30%">
-  </div>
- </div>
+</p>
  <div class="row">
   <div class="column">
     <img width="32%" src="/screenshots/4.png">
