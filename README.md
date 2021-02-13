@@ -4,3 +4,46 @@
 * Бэкенд: Java/Spring для курса "Промышленная разработка на Java" от Naumen. 
 * Фронтенд: Приложение на Android в связке с Kotlin, также одновременно является проектом для курса по Котлину: 
 https://github.com/Arzybek/TVSeriesAndroidKotlin.
+* Screenshots:
+
+<div class="row">
+  <div class="column">
+    <img width="32%" src="/screenshots/1.png">
+  </div>
+  <div class="column">
+    <img src="/screenshots/2.png" width="32%">
+  </div>
+  <div class="column">
+    <img src="/screenshots/3.png" width="32%">
+  </div>
+ </div>
+ <div class="row">
+  <div class="column">
+    <img width="32%" src="/screenshots/4.png">
+  </div>
+  <div class="column">
+    <img src="/screenshots/5.png" width="32%">
+  </div>
+  <div class="column">
+    <img src="/screenshots/6.png" width="32%">
+  </div>
+ </div>
+  <div class="row">
+  <div class="column">
+    <img width="32%" src="/screenshots/7.png">
+  </div>
+  <div class="column">
+    <img src="/screenshots/8.png" width="32%">
+  </div>
+  <div class="column">
+    <img src="/screenshots/9.png" width="32%">
+  </div>
+ </div>
+   <div class="row">
+  <div class="column">
+    <img width="32%" src="/screenshots/10.png">
+  </div>
+  <div class="column">
+    <img src="/screenshots/11.png" width="32%">
+  </div>
+ </div>
