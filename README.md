@@ -1,9 +1,7 @@
 # TVSeriesProject
-* Project: a back-end of the project for the Naumen Java course and a front-end app for the Kotlin course.
-* Идея проекта: каталог различных сериалов, в котором можно добавлять сериалы к себе в списки профиля: "смотрю", "просмотренные", "брошенные", "избранные" и т.д., отмечать серии, на которых вы остановились, выставлять рейтинги сериалам и т.д.
-* Бэкенд: Java/Spring для курса "Промышленная разработка на Java" от Naumen. 
-* Фронтенд: Приложение на Android в связке с Kotlin, также одновременно является проектом для курса по Котлину: 
-https://github.com/Arzybek/TVSeriesAndroidKotlin.
+* The idea: a catalog of various series, in which you can add series to your profile lists: "watching", "watched", "abandoned", "favorites" (and etc.), mark the episodes on which you stopped, rate the series and etc.
+* This repository: backend of the project, Java/Spring (for a course "Industrial Java Development" by Naumen).
+* Frontend: An Android/Kotlin application (for a course "Kotlin"), located here: https://github.com/Arzybek/TVSeriesAndroidKotlin.
 * Screenshots:
 
 <p float="left">
