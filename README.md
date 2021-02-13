@@ -1,6 +1,6 @@
 # TVSeriesProject
 * The idea: a catalog of various series, in which you can add series to your profile lists: "watching", "watched", "abandoned", "favorites" (and etc.), mark the episodes on which you stopped, rate the series and etc.
-* This repository: backend of the project, Java/Spring (for a course "Industrial Java Development" by Naumen).
+* This repository: backend of the project, Java/Spring application (for a course "Industrial Java Development" by Naumen).
 * Frontend: An Android/Kotlin application (for a course "Kotlin"), located here: https://github.com/Arzybek/TVSeriesAndroidKotlin.
 * Screenshots:
 
